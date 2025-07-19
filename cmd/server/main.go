@@ -57,9 +57,6 @@ func main() {
 
 	<-ctx.Done()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
 	shutdownMany(s.Shutdown, acceptor.Shutdown, runner.Close)
 }
 
