@@ -29,7 +29,7 @@ func (b *BotClient) Close() error {
 type Acceptor struct {
 	pb.UnimplementedAcceptorServer
 
-	mu      sync.Mutex
+	mu      sync.RWMutex
 	pending map[string]chan *BotClient
 
 	server *grpc.Server
@@ -81,15 +81,14 @@ func (a *Acceptor) Ready(ctx context.Context, request *pb.ReadyRequest) (*emptyp
 
 	client := pb.NewBotClient(conn)
 
-	a.mu.Lock()
-	defer a.mu.Unlock()
+	a.mu.RLock()
+	defer a.mu.RUnlock()
 
 	ch, ok := a.pending[request.Id]
 	if !ok {
 		return nil, status.Error(codes.PermissionDenied, "acceptor: bot wasn't requested")
 	}
 	ch <- &BotClient{client, conn}
-	delete(a.pending, request.Id)
 
 	return new(emptypb.Empty), nil
 }
@@ -100,6 +99,12 @@ func (a *Acceptor) WaitForBot(ctx context.Context, id uuid.UUID) (*BotClient, er
 	a.mu.Lock()
 	a.pending[id.String()] = ch
 	a.mu.Unlock()
+
+	defer func() {
+		a.mu.Lock()
+		delete(a.pending, id.String())
+		a.mu.Unlock()
+	}()
 
 	select {
 	case b := <-ch:
