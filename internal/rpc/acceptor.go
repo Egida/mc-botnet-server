@@ -29,7 +29,7 @@ func (b *BotClient) Close() error {
 type Acceptor struct {
 	pb.UnimplementedAcceptorServer
 
-	mu      sync.RWMutex
+	mu      sync.Mutex
 	pending map[string]chan *BotClient
 
 	server *grpc.Server
@@ -81,8 +81,8 @@ func (a *Acceptor) Ready(ctx context.Context, request *pb.ReadyRequest) (*emptyp
 
 	client := pb.NewBotClient(conn)
 
-	a.mu.RLock()
-	defer a.mu.RUnlock()
+	a.mu.Lock()
+	defer a.mu.Unlock()
 
 	ch, ok := a.pending[request.Id]
 	if !ok {

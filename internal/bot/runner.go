@@ -2,7 +2,6 @@ package bot
 
 import (
 	"context"
-	"github.com/google/uuid"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -34,11 +33,9 @@ func NewKubernetesRunner() (*KubernetesRunner, error) {
 }
 
 func (r *KubernetesRunner) Start(ctx context.Context, opts *StartOptions) (RunnerHandle, error) {
-	id := uuid.New()
-
 	// TODO move image name to config
 	pods := r.pods()
-	pod := toPod(opts, id, "mc-botnet-bot:latest")
+	pod := toPod(opts, "mc-botnet-bot")
 
 	pod, err := pods.Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
@@ -48,7 +45,7 @@ func (r *KubernetesRunner) Start(ctx context.Context, opts *StartOptions) (Runne
 	return &kubernetesRunnerHandle{pod.Name, pods}, nil
 }
 
-func (r *KubernetesRunner) Close(ctx context.Context) error {
+func (r *KubernetesRunner) Stop(ctx context.Context) error {
 	return r.pods().DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{})
 }
 
@@ -69,16 +66,22 @@ func (r *KubernetesRunner) pods() typedv1.PodInterface {
 	return r.client.CoreV1().Pods("bot")
 }
 
-func toPod(opts *StartOptions, id uuid.UUID, image string) *corev1.Pod {
+func toPod(opts *StartOptions, image string) *corev1.Pod {
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "bot-" + id.String(),
+			Name: "bot-" + opts.BotID.String(),
 		},
 		Spec: corev1.PodSpec{
+			RestartPolicy: corev1.RestartPolicyNever,
 			Containers: []corev1.Container{{
-				Name:  "bot",
-				Image: image,
+				Name:            "bot",
+				Image:           image,
+				ImagePullPolicy: corev1.PullNever,
 				Env: []corev1.EnvVar{
+					{
+						Name:  "BOT_ID",
+						Value: opts.BotID.String(),
+					},
 					{
 						Name:  "BOT_HOST",
 						Value: opts.McHost,

@@ -57,7 +57,7 @@ func main() {
 
 	<-ctx.Done()
 
-	shutdownMany(s.Shutdown, acceptor.Shutdown, runner.Close)
+	shutdownMany(s.Shutdown, acceptor.Shutdown, runner.Stop)
 }
 
 func shutdownMany(fns ...func(ctx context.Context) error) {
