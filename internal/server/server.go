@@ -2,25 +2,30 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/bot"
 	"log/slog"
 	"net/http"
 )
 
 type Server struct {
-	manager *bot.Manager
-
+	conf       *koanf.Koanf
+	manager    *bot.Manager
 	httpServer *http.Server
 }
 
-func NewServer(manager *bot.Manager) (*Server, error) {
-	s := new(Server)
+func NewServer(conf *koanf.Koanf, manager *bot.Manager) (*Server, error) {
+	s := &Server{
+		conf:    conf,
+		manager: manager,
+	}
 
 	mux := registerRoutes(s)
 
-	s.manager = manager
 	s.httpServer = &http.Server{
 		Handler: mux,
+		Addr:    fmt.Sprintf(":%d", conf.MustInt("server.port")),
 	}
 
 	return s, nil
@@ -44,8 +49,7 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
 }
 
-func (s *Server) Run(addr string) error {
-	slog.Info("starting server", "addr", addr)
-	s.httpServer.Addr = addr
+func (s *Server) Run() error {
+	slog.Info("starting server", "addr", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }

@@ -2,7 +2,9 @@ package rpc
 
 import (
 	"context"
+	"fmt"
 	"github.com/google/uuid"
+	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -29,17 +31,21 @@ func (b *BotClient) Close() error {
 type Acceptor struct {
 	pb.UnimplementedAcceptorServer
 
+	conf *koanf.Koanf
+
 	mu      sync.Mutex
 	pending map[string]chan *BotClient
 
 	server *grpc.Server
 }
 
-func NewAcceptor() *Acceptor {
-	return &Acceptor{pending: make(map[string]chan *BotClient)}
+func NewAcceptor(conf *koanf.Koanf) *Acceptor {
+	return &Acceptor{conf: conf, pending: make(map[string]chan *BotClient)}
 }
 
-func (a *Acceptor) Run(addr string) error {
+func (a *Acceptor) Run() error {
+	addr := fmt.Sprintf(":%d", a.conf.MustInt("grpc.port"))
+
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err

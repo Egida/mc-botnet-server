@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/bot"
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
 	"log/slog"
@@ -17,21 +20,30 @@ import (
 )
 
 func main() {
-	// Create the bot runner
-	runner, err := bot.NewKubernetesRunner()
+	conf := koanf.New(".")
+	err := conf.Load(file.Provider("config.toml"), toml.Parser())
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
 
+	// Create the bot runner
+	// runner, err := bot.NewKubernetesRunner(conf)
+	// if err != nil {
+	// 	slog.Error(err.Error())
+	// 	os.Exit(1)
+	// }
+
+	runner := bot.NewLocalRunner(conf)
+
 	// Create the gRPC acceptor
-	acceptor := rpc.NewAcceptor()
+	acceptor := rpc.NewAcceptor(conf)
 
 	// Create the bot manager
 	manager := bot.NewManager(runner, acceptor)
 
 	// Create the HTTP server
-	s, err := server.NewServer(manager)
+	s, err := server.NewServer(conf, manager)
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
@@ -40,7 +52,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		err := acceptor.Run(":8081")
+		err := acceptor.Run()
 		if err != nil && !errors.Is(err, net.ErrClosed) {
 			slog.Error(err.Error())
 		}
@@ -48,7 +60,7 @@ func main() {
 	}()
 
 	go func() {
-		err := s.Run(":8080")
+		err := s.Run()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			slog.Error(err.Error())
 		}
@@ -57,7 +69,7 @@ func main() {
 
 	<-ctx.Done()
 
-	shutdownMany(s.Shutdown, acceptor.Shutdown, runner.Stop)
+	shutdownMany(s.Shutdown, acceptor.Shutdown /*, runner.Stop*/)
 }
 
 func shutdownMany(fns ...func(ctx context.Context) error) {

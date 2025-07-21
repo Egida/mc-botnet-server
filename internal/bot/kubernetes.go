@@ -2,19 +2,22 @@ package bot
 
 import (
 	"context"
-	v3 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/knadh/koanf/v2"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	v2 "k8s.io/client-go/kubernetes/typed/core/v1"
+	typedv1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
 	"strconv"
 )
 
 type KubernetesRunner struct {
+	conf *koanf.Koanf
+
 	client *kubernetes.Clientset
 }
 
-func NewKubernetesRunner() (*KubernetesRunner, error) {
+func NewKubernetesRunner(conf *koanf.Koanf) (*KubernetesRunner, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
@@ -25,15 +28,14 @@ func NewKubernetesRunner() (*KubernetesRunner, error) {
 		return nil, err
 	}
 
-	return &KubernetesRunner{client}, nil
+	return &KubernetesRunner{conf, client}, nil
 }
 
 func (r *KubernetesRunner) Start(ctx context.Context, opts *StartOptions) (RunnerHandle, error) {
-	// TODO move image name to config
 	pods := r.pods()
-	pod := toPod(opts, "mc-botnet-bot")
+	pod := toPod(opts, r.conf)
 
-	pod, err := pods.Create(ctx, pod, v1.CreateOptions{})
+	pod, err := pods.Create(ctx, pod, metav1.CreateOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -42,38 +44,34 @@ func (r *KubernetesRunner) Start(ctx context.Context, opts *StartOptions) (Runne
 }
 
 func (r *KubernetesRunner) Stop(ctx context.Context) error {
-	return r.pods().DeleteCollection(ctx, v1.DeleteOptions{}, v1.ListOptions{})
-}
-
-type RunnerHandle interface {
-	Stop(ctx context.Context) error
+	return r.pods().DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{})
 }
 
 type kubernetesRunnerHandle struct {
 	name string
-	pods v2.PodInterface
+	pods typedv1.PodInterface
 }
 
 func (k *kubernetesRunnerHandle) Stop(ctx context.Context) error {
-	return k.pods.Delete(ctx, k.name, v1.DeleteOptions{})
+	return k.pods.Delete(ctx, k.name, metav1.DeleteOptions{})
 }
 
-func (r *KubernetesRunner) pods() v2.PodInterface {
+func (r *KubernetesRunner) pods() typedv1.PodInterface {
 	return r.client.CoreV1().Pods("bot")
 }
 
-func toPod(opts *StartOptions, image string) *v3.Pod {
-	pod := &v3.Pod{
-		ObjectMeta: v1.ObjectMeta{
+func toPod(opts *StartOptions, conf *koanf.Koanf) *corev1.Pod {
+	pod := &corev1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
 			Name: "bot-" + opts.BotID.String(),
 		},
-		Spec: v3.PodSpec{
-			RestartPolicy: v3.RestartPolicyNever,
-			Containers: []v3.Container{{
+		Spec: corev1.PodSpec{
+			RestartPolicy: corev1.RestartPolicy(conf.MustString("bot.image.restart")),
+			Containers: []corev1.Container{{
 				Name:            "bot",
-				Image:           image,
-				ImagePullPolicy: v3.PullNever,
-				Env: []v3.EnvVar{
+				Image:           conf.MustString("bot.image.name"),
+				ImagePullPolicy: corev1.PullPolicy(conf.MustString("bot.image.pull_policy")),
+				Env: []corev1.EnvVar{
 					{
 						Name:  "BOT_ID",
 						Value: opts.BotID.String(),
@@ -108,7 +106,7 @@ func toPod(opts *StartOptions, image string) *v3.Pod {
 	}
 
 	if opts.McToken != "" {
-		pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, v3.EnvVar{
+		pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
 			Name:  "BOT_TOKEN",
 			Value: opts.McToken,
 		})
