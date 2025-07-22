@@ -8,6 +8,7 @@ import (
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -54,7 +55,7 @@ func (a *Acceptor) Run() error {
 	a.server = grpc.NewServer()
 	pb.RegisterAcceptorServer(a.server, a)
 
-	slog.Info("starting gRPC acceptor", "addr", addr)
+	slog.Info("acceptor: starting", "addr", addr)
 	return a.server.Serve(lis)
 }
 
@@ -75,14 +76,16 @@ func (a *Acceptor) Shutdown(ctx context.Context) error {
 }
 
 func (a *Acceptor) Ready(ctx context.Context, request *pb.ReadyRequest) (*emptypb.Empty, error) {
+	slog.Debug("acceptor: received ready request", "request", request)
+
 	p, ok := peer.FromContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Internal, "acceptor: no peer found")
 	}
 
-	conn, err := grpc.NewClient(p.Addr.String())
+	conn, err := grpc.NewClient(p.Addr.String(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, fmt.Sprintf("acceptor: %s", err))
 	}
 
 	client := pb.NewBotClient(conn)

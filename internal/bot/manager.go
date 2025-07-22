@@ -5,6 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
 	"log/slog"
+	"sync"
 )
 
 type StartOptions struct {
@@ -23,15 +24,38 @@ type StartOptions struct {
 type Bot struct {
 	ID     uuid.UUID
 	client rpc.BotClient
+	handle RunnerHandle
 }
 
 type Manager struct {
 	runner   Runner
 	acceptor *rpc.Acceptor
+
+	mu   sync.RWMutex
+	bots map[uuid.UUID]*Bot
 }
 
 func NewManager(runner Runner, acceptor *rpc.Acceptor) *Manager {
-	return &Manager{runner, acceptor}
+	return &Manager{
+		runner:   runner,
+		acceptor: acceptor,
+		bots:     make(map[uuid.UUID]*Bot),
+	}
+}
+
+func (m *Manager) Stop(ctx context.Context) error {
+	var wg sync.WaitGroup
+	for _, bot := range m.bots {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			bot.client.Close()
+			bot.handle.Stop(ctx)
+		}()
+	}
+	wg.Wait()
+	return nil
 }
 
 func (m *Manager) StartBot(ctx context.Context) error {

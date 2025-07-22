@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/knadh/koanf/v2"
+	"io"
 	"log/slog"
 	"os/exec"
 	"strconv"
@@ -21,7 +22,7 @@ func NewLocalRunner(conf *koanf.Koanf) *LocalRunner {
 }
 
 func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle, error) {
-	slog.Info("starting local runner")
+	slog.Info("runner: starting", "type", "local")
 
 	cmd := exec.Command(r.conf.MustString("bot.local.exec"), r.conf.MustStrings("bot.local.args")...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
@@ -30,9 +31,12 @@ func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle
 	opts.GRPCPort = r.conf.MustInt("grpc.port")
 	cmd.Env = toEnv(opts)
 
-	fmt.Println(cmd.Env)
-
 	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, err
+	}
+
+	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return nil, err
 	}
@@ -42,14 +46,8 @@ func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle
 		return nil, err
 	}
 
-	go func() {
-		scanner := bufio.NewScanner(stdout)
-		id := opts.BotID.String()
-		id = id[len(id)-6:]
-		for scanner.Scan() {
-			slog.Info(fmt.Sprintf("bot %s: %s", id, scanner.Text()))
-		}
-	}()
+	go pipeOutput(stdout, opts)
+	go pipeOutput(stderr, opts)
 
 	done := make(chan error, 1)
 	go func() {
@@ -59,13 +57,22 @@ func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle
 	return &localRunnerHandle{cmd, done}, nil
 }
 
+func pipeOutput(r io.ReadCloser, opts *StartOptions) {
+	scanner := bufio.NewScanner(r)
+	id := opts.BotID.String()
+	id = id[len(id)-6:]
+	for scanner.Scan() {
+		slog.Debug(fmt.Sprintf("bot %s: %s", id, scanner.Text()))
+	}
+}
+
 type localRunnerHandle struct {
 	cmd  *exec.Cmd
 	done <-chan error
 }
 
 func (l *localRunnerHandle) Stop(ctx context.Context) error {
-	slog.Info("stopping local runner")
+	slog.Info("runner: stopping", "type", "local")
 
 	pgid, err := syscall.Getpgid(l.cmd.Process.Pid)
 	if err != nil {

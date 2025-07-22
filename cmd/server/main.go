@@ -49,7 +49,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		err := acceptor.Run()
@@ -69,6 +69,7 @@ func main() {
 
 	<-ctx.Done()
 
+	slog.Info("shutting down gracefully")
 	shutdownMany(s.Shutdown, acceptor.Shutdown /*, runner.Stop*/)
 }
 

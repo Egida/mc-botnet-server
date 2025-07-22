@@ -44,12 +44,12 @@ func registerRoutes(s *Server) *http.ServeMux {
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	slog.Info("shutting down server")
+	slog.Info("server: shutting down")
 
 	return s.httpServer.Shutdown(ctx)
 }
 
 func (s *Server) Run() error {
-	slog.Info("starting server", "addr", s.httpServer.Addr)
+	slog.Info("server: starting", "addr", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }
