@@ -50,8 +50,14 @@ func (m *Manager) Stop(ctx context.Context) error {
 		go func() {
 			defer wg.Done()
 
-			bot.client.Close()
-			bot.handle.Stop(ctx)
+			err := bot.client.Close()
+			if err != nil {
+				slog.Error("manager: failed to close client", "error", err, "id", bot.ID)
+			}
+			err = bot.handle.Stop(ctx)
+			if err != nil {
+				slog.Error("manager: failed to stop runner", "error", err, "id", bot.ID)
+			}
 		}()
 	}
 	wg.Wait()
