@@ -2,10 +2,12 @@ package bot
 
 import (
 	"context"
-	"github.com/google/uuid"
-	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
 	"log/slog"
 	"sync"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
 )
 
 type StartOptions struct {
@@ -76,13 +78,15 @@ func (m *Manager) StartBot(ctx context.Context) error {
 		return err
 	}
 	defer handle.Stop(ctx)
-	slog.Info("started bot", "id", id)
+	slog.Info("manager: started bot", "id", id)
 
 	botClient, err := m.acceptor.WaitForBot(ctx, id)
 	if err != nil {
 		return err
 	}
-	slog.Info("connected to bot", "id", id)
+	slog.Info("manager: connected to bot", "id", id)
+
+	time.Sleep(10 * time.Second)
 
 	return botClient.Close()
 }

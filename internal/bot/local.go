@@ -5,12 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/knadh/koanf/v2"
 	"io"
 	"log/slog"
 	"os/exec"
 	"strconv"
 	"syscall"
+
+	"github.com/knadh/koanf/v2"
 )
 
 type LocalRunner struct {
@@ -22,7 +23,7 @@ func NewLocalRunner(conf *koanf.Koanf) *LocalRunner {
 }
 
 func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle, error) {
-	slog.Info("runner: starting", "type", "local")
+	slog.Info("runner: starting")
 
 	cmd := exec.Command(r.conf.MustString("bot.local.exec"), r.conf.MustStrings("bot.local.args")...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
@@ -41,13 +42,13 @@ func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle
 		return nil, err
 	}
 
+	go pipeOutput(stdout, opts)
+	go pipeOutput(stderr, opts)
+
 	err = cmd.Start()
 	if err != nil {
 		return nil, err
 	}
-
-	go pipeOutput(stdout, opts)
-	go pipeOutput(stderr, opts)
 
 	done := make(chan error, 1)
 	go func() {
@@ -72,7 +73,7 @@ type localRunnerHandle struct {
 }
 
 func (l *localRunnerHandle) Stop(ctx context.Context) error {
-	slog.Info("runner: stopping", "type", "local")
+	slog.Info("runner: stopping")
 
 	pgid, err := syscall.Getpgid(l.cmd.Process.Pid)
 	if err != nil {
@@ -98,7 +99,7 @@ func toEnv(opts *StartOptions) []string {
 	}
 
 	env := []string{
-		pair("BOT_ID", opts.McHost),
+		pair("BOT_ID", opts.BotID.String()),
 		pair("BOT_HOST", opts.McHost),
 		pair("BOT_PORT", strconv.Itoa(opts.McPort)),
 		pair("BOT_USERNAME", opts.McUsername),

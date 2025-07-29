@@ -2,24 +2,24 @@ package main
 
 import (
 	"context"
-	"errors"
-	"github.com/knadh/koanf/parsers/toml"
-	"github.com/knadh/koanf/providers/file"
-	"github.com/knadh/koanf/v2"
-	"github.com/mc-botnet/mc-botnet-server/internal/bot"
-	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
 	"log/slog"
-	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
+	"github.com/mc-botnet/mc-botnet-server/internal/bot"
+	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
+
 	"github.com/mc-botnet/mc-botnet-server/internal/server"
 )
 
 func main() {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
+
 	conf := koanf.New(".")
 	err := conf.Load(file.Provider("config.toml"), toml.Parser())
 	if err != nil {
@@ -49,25 +49,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	errorCtx, errorCancel := context.WithCancelCause(context.Background())
 
-	go func() {
-		err := acceptor.Run()
-		if err != nil && !errors.Is(err, net.ErrClosed) {
-			slog.Error(err.Error())
-		}
-		stop()
-	}()
+	go func() { errorCancel(s.Run()) }()
+	go func() { errorCancel(acceptor.Run()) }()
 
-	go func() {
-		err := s.Run()
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error(err.Error())
-		}
-		stop()
-	}()
-
-	<-ctx.Done()
+	select {
+	case <-ctx.Done():
+		slog.Info("termination signal received")
+	case <-errorCtx.Done():
+		slog.Error(errorCtx.Err().Error())
+	}
 
 	slog.Info("shutting down gracefully")
 	shutdownMany(s.Shutdown, acceptor.Shutdown /*, runner.Stop*/)

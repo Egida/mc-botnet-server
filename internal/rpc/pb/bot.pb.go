@@ -25,6 +25,7 @@ const (
 type ReadyRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Port          int32                  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -64,6 +65,13 @@ func (x *ReadyRequest) GetId() string {
 		return x.Id
 	}
 	return ""
+}
+
+func (x *ReadyRequest) GetPort() int32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
 }
 
 type PingResponse struct {
@@ -114,9 +122,10 @@ var File_bot_proto protoreflect.FileDescriptor
 
 const file_bot_proto_rawDesc = "" +
 	"\n" +
-	"\tbot.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x1e\n" +
+	"\tbot.proto\x1a\x1bgoogle/protobuf/empty.proto\"2\n" +
 	"\fReadyRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"(\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04port\x18\x02 \x01(\x05R\x04port\"(\n" +
 	"\fPingResponse\x12\x18\n" +
 	"\apayload\x18\x01 \x01(\tR\apayload2:\n" +
 	"\bAcceptor\x12.\n" +
