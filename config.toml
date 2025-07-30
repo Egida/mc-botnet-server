@@ -6,5 +6,10 @@ image = { name = "mc-botnet-bot", restart = "Never", pull_policy = "Never" }
 local.exec = "bun"
 local.args = ["/home/bakane/Projects/mc-botnet-bot/dist/index.js"]
 
+runner.type = "local"
+[runner.local]
+exec = "bun"
+args = ["/home/bakane/Projects/mc-botnet-bot/dist/index.js"]
+
 [grpc]
 port = 8081

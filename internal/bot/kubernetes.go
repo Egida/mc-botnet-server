@@ -11,6 +11,8 @@ import (
 	"strconv"
 )
 
+// TODO fix Kubernetes runner
+
 type KubernetesRunner struct {
 	conf *koanf.Koanf
 
@@ -28,7 +30,7 @@ func NewKubernetesRunner(conf *koanf.Koanf) (*KubernetesRunner, error) {
 		return nil, err
 	}
 
-	return &KubernetesRunner{conf, client}, nil
+	return &KubernetesRunner{conf.Cut("runner.kubernetes"), client}, nil
 }
 
 func (r *KubernetesRunner) Start(ctx context.Context, opts *StartOptions) (RunnerHandle, error) {
@@ -66,11 +68,11 @@ func toPod(opts *StartOptions, conf *koanf.Koanf) *corev1.Pod {
 			Name: "bot-" + opts.BotID.String(),
 		},
 		Spec: corev1.PodSpec{
-			RestartPolicy: corev1.RestartPolicy(conf.MustString("bot.image.restart")),
+			RestartPolicy: corev1.RestartPolicy(conf.MustString("image.restart")),
 			Containers: []corev1.Container{{
 				Name:            "bot",
-				Image:           conf.MustString("bot.image.name"),
-				ImagePullPolicy: corev1.PullPolicy(conf.MustString("bot.image.pull_policy")),
+				Image:           conf.MustString("image.name"),
+				ImagePullPolicy: corev1.PullPolicy(conf.MustString("image.pull_policy")),
 				Env: []corev1.EnvVar{
 					{
 						Name:  "BOT_ID",

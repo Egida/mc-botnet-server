@@ -62,6 +62,10 @@ func (a *Acceptor) Run() error {
 }
 
 func (a *Acceptor) Shutdown(ctx context.Context) error {
+	if a.server == nil {
+		return nil
+	}
+
 	done := make(chan struct{})
 	go func() {
 		a.server.GracefulStop()

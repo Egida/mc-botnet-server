@@ -25,7 +25,7 @@ func NewLocalRunner(conf *koanf.Koanf) *LocalRunner {
 func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle, error) {
 	slog.Info("runner: starting")
 
-	cmd := exec.Command(r.conf.MustString("bot.local.exec"), r.conf.MustStrings("bot.local.args")...)
+	cmd := exec.Command(r.conf.MustString("runner.local.exec"), r.conf.MustStrings("runner.local.args")...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 
 	opts.GRPCHost = "localhost"
@@ -33,6 +33,7 @@ func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle
 	cmd.Env = toEnv(opts)
 
 	stdout, err := cmd.StdoutPipe()
+
 	if err != nil {
 		return nil, err
 	}
