@@ -5,8 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/charmbracelet/log"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"io"
-	"log/slog"
 	"os/exec"
 	"strconv"
 	"syscall"
@@ -16,14 +17,15 @@ import (
 
 type LocalRunner struct {
 	conf *koanf.Koanf
+	l    *log.Logger
 }
 
 func NewLocalRunner(conf *koanf.Koanf) *LocalRunner {
-	return &LocalRunner{conf}
+	return &LocalRunner{conf, logger.New("runner", log.InfoLevel)}
 }
 
 func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle, error) {
-	slog.Info("runner: starting")
+	r.l.Info("runner: starting")
 
 	cmd := exec.Command(r.conf.MustString("runner.local.exec"), r.conf.MustStrings("runner.local.args")...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
@@ -63,8 +65,9 @@ func pipeOutput(r io.ReadCloser, opts *StartOptions) {
 	scanner := bufio.NewScanner(r)
 	id := opts.BotID.String()
 	id = id[len(id)-6:]
+	l := logger.New(fmt.Sprintf("bot %s", id), log.DebugLevel)
 	for scanner.Scan() {
-		slog.Debug(fmt.Sprintf("bot %s: %s", id, scanner.Text()))
+		l.Debug(scanner.Text())
 	}
 }
 
@@ -74,8 +77,6 @@ type localRunnerHandle struct {
 }
 
 func (l *localRunnerHandle) Stop(ctx context.Context) error {
-	slog.Info("runner: stopping")
-
 	pgid, err := syscall.Getpgid(l.cmd.Process.Pid)
 	if err != nil {
 		return err

@@ -2,7 +2,8 @@ package bot
 
 import (
 	"context"
-	"log/slog"
+	"github.com/charmbracelet/log"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"sync"
 	"time"
 
@@ -32,6 +33,7 @@ type Bot struct {
 type Manager struct {
 	runner   Runner
 	acceptor *rpc.Acceptor
+	l        *log.Logger
 
 	mu   sync.RWMutex
 	bots map[uuid.UUID]*Bot
@@ -41,6 +43,7 @@ func NewManager(runner Runner, acceptor *rpc.Acceptor) *Manager {
 	return &Manager{
 		runner:   runner,
 		acceptor: acceptor,
+		l:        logger.New("manager", log.InfoLevel),
 		bots:     make(map[uuid.UUID]*Bot),
 	}
 }
@@ -54,11 +57,11 @@ func (m *Manager) Stop(ctx context.Context) error {
 
 			err := bot.client.Close()
 			if err != nil {
-				slog.Error("manager: failed to close client", "error", err, "id", bot.ID)
+				m.l.Error("failed to close client", "error", err, "id", bot.ID)
 			}
 			err = bot.handle.Stop(ctx)
 			if err != nil {
-				slog.Error("manager: failed to stop runner", "error", err, "id", bot.ID)
+				m.l.Error("failed to stop runner", "error", err, "id", bot.ID)
 			}
 		}()
 	}
@@ -78,13 +81,13 @@ func (m *Manager) StartBot(ctx context.Context) error {
 		return err
 	}
 	defer handle.Stop(ctx)
-	slog.Info("manager: started bot", "id", id)
+	m.l.Info("started bot", "id", id)
 
 	botClient, err := m.acceptor.WaitForBot(ctx, id)
 	if err != nil {
 		return err
 	}
-	slog.Info("manager: connected to bot", "id", id)
+	m.l.Info("connected to bot", "id", id)
 
 	time.Sleep(10 * time.Second)
 

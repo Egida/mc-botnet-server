@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/charmbracelet/log"
 	"github.com/mc-botnet/mc-botnet-server/internal/config"
-	"log/slog"
-	"os"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"os/signal"
 	"syscall"
 	"time"
@@ -16,12 +16,12 @@ import (
 )
 
 func main() {
-	slog.SetLogLoggerLevel(slog.LevelDebug)
+	l := logger.New("main", log.InfoLevel)
+	log.SetDefault(l)
 
 	conf, err := config.NewConfig()
 	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 
 	var runner bot.Runner
@@ -31,14 +31,12 @@ func main() {
 	case "kubernetes":
 		k, err := bot.NewKubernetesRunner(conf)
 		if err != nil {
-			slog.Error(err.Error())
-			os.Exit(1)
+			log.Fatal(err.Error())
 		}
 		runner = k
 		defer shutdown(k.Stop)
 	default:
-		slog.Error("invalid runner type", "type", typ)
-		os.Exit(1)
+		log.Fatal("invalid runner type", "type", typ)
 	}
 
 	// Create the gRPC acceptor
@@ -51,8 +49,7 @@ func main() {
 	// Create the HTTP server
 	s, err := server.NewServer(conf, manager)
 	if err != nil {
-		slog.Error(err.Error())
-		os.Exit(1)
+		log.Fatal(err.Error())
 	}
 	defer shutdown(s.Shutdown)
 
@@ -65,19 +62,19 @@ func main() {
 
 	select {
 	case <-ctx.Done():
-		slog.Info("termination signal received")
+		log.Info("termination signal received")
 	case <-errorCtx.Done():
-		slog.Error(errorCtx.Err().Error())
+		log.Error(errorCtx.Err().Error())
 	}
 
-	slog.Info("shutting down")
+	log.Info("shutting down")
 }
 
 func shutdown(fn func(ctx context.Context) error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	err := fn(ctx)
 	if err != nil {
-		slog.Error(err.Error())
+		log.Error(err.Error())
 	}
 	cancel()
 }

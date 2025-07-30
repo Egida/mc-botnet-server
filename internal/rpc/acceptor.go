@@ -3,7 +3,8 @@ package rpc
 import (
 	"context"
 	"fmt"
-	"log/slog"
+	"github.com/charmbracelet/log"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"net"
 	"strconv"
 	"sync"
@@ -35,6 +36,7 @@ type Acceptor struct {
 	pb.UnimplementedAcceptorServer
 
 	conf *koanf.Koanf
+	l    *log.Logger
 
 	mu      sync.Mutex
 	pending map[string]chan *BotClient
@@ -43,7 +45,7 @@ type Acceptor struct {
 }
 
 func NewAcceptor(conf *koanf.Koanf) *Acceptor {
-	return &Acceptor{conf: conf, pending: make(map[string]chan *BotClient)}
+	return &Acceptor{conf: conf, l: logger.New("acceptor", log.InfoLevel), pending: make(map[string]chan *BotClient)}
 }
 
 func (a *Acceptor) Run() error {
@@ -57,7 +59,7 @@ func (a *Acceptor) Run() error {
 	a.server = grpc.NewServer()
 	pb.RegisterAcceptorServer(a.server, a)
 
-	slog.Info("acceptor: starting", "addr", addr)
+	log.Info("starting", "addr", addr)
 	return a.server.Serve(lis)
 }
 
@@ -82,10 +84,10 @@ func (a *Acceptor) Shutdown(ctx context.Context) error {
 }
 
 func (a *Acceptor) Ready(ctx context.Context, request *pb.ReadyRequest) (*emptypb.Empty, error) {
-	slog.Debug("acceptor: /Ready")
+	log.Debug("/Ready called")
 	err := a.ready(ctx, request)
 	if err != nil {
-		slog.Error("acceptor: error in /Ready", "err", err)
+		log.Error("error in /Ready", "err", err)
 		return nil, fmt.Errorf("acceptor: %w", err)
 	}
 	return new(emptypb.Empty), nil

@@ -3,15 +3,17 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/charmbracelet/log"
 	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/bot"
-	"log/slog"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"net/http"
 )
 
 type Server struct {
 	conf       *koanf.Koanf
 	manager    *bot.Manager
+	l          *log.Logger
 	httpServer *http.Server
 }
 
@@ -19,6 +21,7 @@ func NewServer(conf *koanf.Koanf, manager *bot.Manager) (*Server, error) {
 	s := &Server{
 		conf:    conf,
 		manager: manager,
+		l:       logger.New("server", log.InfoLevel),
 	}
 
 	mux := registerRoutes(s)
@@ -44,12 +47,12 @@ func registerRoutes(s *Server) *http.ServeMux {
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	slog.Info("server: shutting down")
+	s.l.Info("shutting down")
 
 	return s.httpServer.Shutdown(ctx)
 }
 
 func (s *Server) Run() error {
-	slog.Info("server: starting", "addr", s.httpServer.Addr)
+	s.l.Info("starting", "addr", s.httpServer.Addr)
 	return s.httpServer.ListenAndServe()
 }
