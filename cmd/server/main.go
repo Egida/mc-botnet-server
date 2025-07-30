@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/charmbracelet/log"
 	"github.com/mc-botnet/mc-botnet-server/internal/config"
+	"github.com/mc-botnet/mc-botnet-server/internal/database"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"os/signal"
 	"syscall"
@@ -16,10 +17,15 @@ import (
 )
 
 func main() {
-	l := logger.New("main", log.InfoLevel)
+	l := logger.NewLogger("main", log.InfoLevel)
 	log.SetDefault(l)
 
 	conf, err := config.NewConfig()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	_, err = database.NewDatabase(conf)
 	if err != nil {
 		log.Fatal(err.Error())
 	}

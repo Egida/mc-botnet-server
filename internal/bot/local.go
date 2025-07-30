@@ -21,7 +21,7 @@ type LocalRunner struct {
 }
 
 func NewLocalRunner(conf *koanf.Koanf) *LocalRunner {
-	return &LocalRunner{conf, logger.New("runner", log.InfoLevel)}
+	return &LocalRunner{conf, logger.NewLogger("runner", log.InfoLevel)}
 }
 
 func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle, error) {
@@ -65,7 +65,7 @@ func pipeOutput(r io.ReadCloser, opts *StartOptions) {
 	scanner := bufio.NewScanner(r)
 	id := opts.BotID.String()
 	id = id[len(id)-6:]
-	l := logger.New(fmt.Sprintf("bot %s", id), log.DebugLevel)
+	l := logger.NewLogger(fmt.Sprintf("bot %s", id), log.DebugLevel)
 	for scanner.Scan() {
 		l.Debug(scanner.Text())
 	}

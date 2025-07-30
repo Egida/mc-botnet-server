@@ -45,7 +45,7 @@ type Acceptor struct {
 }
 
 func NewAcceptor(conf *koanf.Koanf) *Acceptor {
-	return &Acceptor{conf: conf, l: logger.New("acceptor", log.InfoLevel), pending: make(map[string]chan *BotClient)}
+	return &Acceptor{conf: conf, l: logger.NewLogger("acceptor", log.InfoLevel), pending: make(map[string]chan *BotClient)}
 }
 
 func (a *Acceptor) Run() error {

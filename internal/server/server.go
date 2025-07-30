@@ -21,7 +21,7 @@ func NewServer(conf *koanf.Koanf, manager *bot.Manager) (*Server, error) {
 	s := &Server{
 		conf:    conf,
 		manager: manager,
-		l:       logger.New("server", log.InfoLevel),
+		l:       logger.NewLogger("server", log.InfoLevel),
 	}
 
 	mux := registerRoutes(s)
