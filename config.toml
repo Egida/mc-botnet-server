@@ -5,7 +5,7 @@ port = 8080
 type = "local"
 
 [runner.local]
-exec = "bun"
+cmd = "bun"
 args = ["/home/bakane/Projects/mc-botnet-bot/dist/index.js"]
 
 [runner.kubernetes]

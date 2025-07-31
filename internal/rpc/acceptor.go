@@ -35,21 +35,26 @@ func (b *BotClient) Close() error {
 type Acceptor struct {
 	pb.UnimplementedAcceptorServer
 
-	conf *koanf.Koanf
-	l    *log.Logger
+	l *log.Logger
 
 	mu      sync.Mutex
 	pending map[string]chan *BotClient
 
 	server *grpc.Server
+
+	grpcPort int
 }
 
 func NewAcceptor(conf *koanf.Koanf) *Acceptor {
-	return &Acceptor{conf: conf, l: logger.NewLogger("acceptor", log.InfoLevel), pending: make(map[string]chan *BotClient)}
+	return &Acceptor{
+		l:        logger.NewLogger("acceptor", log.InfoLevel),
+		pending:  make(map[string]chan *BotClient),
+		grpcPort: conf.MustInt("grpc.port"),
+	}
 }
 
 func (a *Acceptor) Run() error {
-	addr := fmt.Sprintf(":%d", a.conf.MustInt("grpc.port"))
+	addr := fmt.Sprintf(":%d", a.grpcPort)
 
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {

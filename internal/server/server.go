@@ -5,23 +5,25 @@ import (
 	"fmt"
 	"github.com/charmbracelet/log"
 	"github.com/knadh/koanf/v2"
+	"github.com/mc-botnet/mc-botnet-server/internal/auth"
 	"github.com/mc-botnet/mc-botnet-server/internal/bot"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"net/http"
 )
 
 type Server struct {
-	conf       *koanf.Koanf
-	manager    *bot.Manager
-	l          *log.Logger
+	l           *log.Logger
+	manager     *bot.Manager
+	authService *auth.Service
+
 	httpServer *http.Server
 }
 
-func NewServer(conf *koanf.Koanf, manager *bot.Manager) (*Server, error) {
+func NewServer(conf *koanf.Koanf, manager *bot.Manager, authService *auth.Service) (*Server, error) {
 	s := &Server{
-		conf:    conf,
-		manager: manager,
-		l:       logger.NewLogger("server", log.InfoLevel),
+		l:           logger.NewLogger("server", log.InfoLevel),
+		manager:     manager,
+		authService: authService,
 	}
 
 	mux := registerRoutes(s)
@@ -44,6 +46,13 @@ func registerRoutes(s *Server) *http.ServeMux {
 	mux.HandleFunc("POST /bot", s.createBot)
 
 	return mux
+}
+
+func w(fn http.HandlerFunc, middlewares ...func(http.HandlerFunc) http.HandlerFunc) http.HandlerFunc {
+	for _, m := range middlewares {
+		fn = m(fn)
+	}
+	return fn
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
