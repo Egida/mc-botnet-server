@@ -18,6 +18,11 @@ import (
 
 var ErrUnauthorized = errors.New("auth: unauthorized")
 
+// UserID panics if r doesn't have the user ID. Use only in [Service.Middleware]-protected handlers.
+func UserID(r *http.Request) int {
+	return r.Context().Value("userID").(int)
+}
+
 type Service struct {
 	l     *log.Logger
 	store database.Store
@@ -113,7 +118,7 @@ func (s *Service) Middleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		r = r.WithContext(context.WithValue(r.Context(), "userId", sub))
+		r = r.WithContext(context.WithValue(r.Context(), "userID", sub))
 		next(w, r)
 	}
 }
