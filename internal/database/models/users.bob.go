@@ -7,7 +7,6 @@ import (
 	"context"
 	"io"
 
-	"github.com/aarondl/opt/omit"
 	"github.com/stephenafamo/bob"
 	"github.com/stephenafamo/bob/dialect/sqlite"
 	"github.com/stephenafamo/bob/dialect/sqlite/dialect"
@@ -110,34 +109,49 @@ type userErrors struct {
 // All values are optional, and do not have to be set
 // Generated columns are not included
 type UserSetter struct {
-	ID       omit.Val[int32]  `db:"ID,pk" `
-	Username omit.Val[string] `db:"username" `
-	Password omit.Val[string] `db:"password" `
+	ID       *int32  `db:"ID,pk" `
+	Username *string `db:"username" `
+	Password *string `db:"password" `
 }
 
 func (s UserSetter) SetColumns() []string {
 	vals := make([]string, 0, 3)
-	if s.ID.IsValue() {
+	if s.ID != nil {
 		vals = append(vals, "ID")
 	}
-	if s.Username.IsValue() {
+	if s.Username != nil {
 		vals = append(vals, "username")
 	}
-	if s.Password.IsValue() {
+	if s.Password != nil {
 		vals = append(vals, "password")
 	}
 	return vals
 }
 
 func (s UserSetter) Overwrite(t *User) {
-	if s.ID.IsValue() {
-		t.ID = s.ID.MustGet()
+	if s.ID != nil {
+		t.ID = func() int32 {
+			if s.ID == nil {
+				return *new(int32)
+			}
+			return *s.ID
+		}()
 	}
-	if s.Username.IsValue() {
-		t.Username = s.Username.MustGet()
+	if s.Username != nil {
+		t.Username = func() string {
+			if s.Username == nil {
+				return *new(string)
+			}
+			return *s.Username
+		}()
 	}
-	if s.Password.IsValue() {
-		t.Password = s.Password.MustGet()
+	if s.Password != nil {
+		t.Password = func() string {
+			if s.Password == nil {
+				return *new(string)
+			}
+			return *s.Password
+		}()
 	}
 }
 
@@ -156,16 +170,31 @@ func (s *UserSetter) Apply(q *dialect.InsertQuery) {
 
 	q.AppendValues(bob.ExpressionFunc(func(ctx context.Context, w io.Writer, d bob.Dialect, start int) ([]any, error) {
 		vals := make([]bob.Expression, 0, 3)
-		if s.ID.IsValue() {
-			vals = append(vals, sqlite.Arg(s.ID.MustGet()))
+		if s.ID != nil {
+			vals = append(vals, sqlite.Arg(func() int32 {
+				if s.ID == nil {
+					return *new(int32)
+				}
+				return *s.ID
+			}()))
 		}
 
-		if s.Username.IsValue() {
-			vals = append(vals, sqlite.Arg(s.Username.MustGet()))
+		if s.Username != nil {
+			vals = append(vals, sqlite.Arg(func() string {
+				if s.Username == nil {
+					return *new(string)
+				}
+				return *s.Username
+			}()))
 		}
 
-		if s.Password.IsValue() {
-			vals = append(vals, sqlite.Arg(s.Password.MustGet()))
+		if s.Password != nil {
+			vals = append(vals, sqlite.Arg(func() string {
+				if s.Password == nil {
+					return *new(string)
+				}
+				return *s.Password
+			}()))
 		}
 
 		if len(vals) == 0 {
@@ -183,21 +212,21 @@ func (s UserSetter) UpdateMod() bob.Mod[*dialect.UpdateQuery] {
 func (s UserSetter) Expressions(prefix ...string) []bob.Expression {
 	exprs := make([]bob.Expression, 0, 3)
 
-	if s.ID.IsValue() {
+	if s.ID != nil {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "ID")...),
 			sqlite.Arg(s.ID),
 		}})
 	}
 
-	if s.Username.IsValue() {
+	if s.Username != nil {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "username")...),
 			sqlite.Arg(s.Username),
 		}})
 	}
 
-	if s.Password.IsValue() {
+	if s.Password != nil {
 		exprs = append(exprs, expr.Join{Sep: " = ", Exprs: []bob.Expression{
 			sqlite.Quote(append(prefix, "password")...),
 			sqlite.Arg(s.Password),

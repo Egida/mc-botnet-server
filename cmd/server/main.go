@@ -55,7 +55,10 @@ func run() error {
 	store := database.NewSQLStore(db)
 
 	// Auth service
-	authService := auth.NewService(conf, store)
+	authService, err := auth.NewService(conf, store)
+	if err != nil {
+		return err
+	}
 
 	// Runner
 	runner, cleanup, err := provideRunner(conf)

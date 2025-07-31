@@ -56,8 +56,6 @@ func w(fn http.HandlerFunc, middlewares ...func(http.HandlerFunc) http.HandlerFu
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	s.l.Info("shutting down")
-
 	return s.httpServer.Shutdown(ctx)
 }
 

@@ -64,7 +64,7 @@ func (a *Acceptor) Run() error {
 	a.server = grpc.NewServer()
 	pb.RegisterAcceptorServer(a.server, a)
 
-	log.Info("starting", "addr", addr)
+	a.l.Info("starting", "addr", addr)
 	return a.server.Serve(lis)
 }
 
@@ -89,10 +89,10 @@ func (a *Acceptor) Shutdown(ctx context.Context) error {
 }
 
 func (a *Acceptor) Ready(ctx context.Context, request *pb.ReadyRequest) (*emptypb.Empty, error) {
-	log.Debug("/Ready called")
+	a.l.Debug("/Ready called")
 	err := a.ready(ctx, request)
 	if err != nil {
-		log.Error("error in /Ready", "err", err)
+		a.l.Error("error in /Ready", "err", err)
 		return nil, fmt.Errorf("acceptor: %w", err)
 	}
 	return new(emptypb.Empty), nil

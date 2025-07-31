@@ -4,3 +4,4 @@ sqlite:
   output: "./internal/database/models"
 no_factory: true
 no_tests: true
+type_system: "database/sql"
