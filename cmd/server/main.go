@@ -75,7 +75,7 @@ func run() error {
 	manager := bot.NewManager(runner, acceptor)
 
 	// HTTP Server
-	s, err := server.NewServer(conf, manager, authService)
+	s, err := server.NewServer(conf, manager, authService, store)
 	if err != nil {
 		return err
 	}

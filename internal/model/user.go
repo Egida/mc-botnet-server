@@ -10,6 +10,10 @@ type SignIn struct {
 	Password string `json:"password"`
 }
 
+type AuthResponse struct {
+	Token string `json:"token"`
+}
+
 type User struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`

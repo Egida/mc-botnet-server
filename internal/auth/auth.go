@@ -52,6 +52,14 @@ func NewService(conf *koanf.Koanf, store database.Store) (*Service, error) {
 }
 
 func (s *Service) SignUp(ctx context.Context, req *model.SignUp) (string, error) {
+	exists, err := s.store.UserExistsByUsername(ctx, req.Username)
+	if err != nil {
+		return "", err
+	}
+	if exists {
+		return "", database.ErrConflict
+	}
+
 	hashed, err := hash(req.Password)
 	if err != nil {
 		return "", err
@@ -72,7 +80,7 @@ func (s *Service) SignUp(ctx context.Context, req *model.SignUp) (string, error)
 }
 
 func (s *Service) SignIn(ctx context.Context, req *model.SignIn) (string, error) {
-	u, err := s.store.GetUserByUsername(ctx, req.Username)
+	u, err := s.store.FindUserByUsername(ctx, req.Username)
 	if err != nil {
 		return "", err
 	}
