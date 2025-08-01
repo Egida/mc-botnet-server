@@ -122,13 +122,15 @@ var Acceptor_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Bot_Ping_FullMethodName = "/Bot/Ping"
+	Bot_StreamEvents_FullMethodName = "/Bot/StreamEvents"
+	Bot_Ping_FullMethodName         = "/Bot/Ping"
 )
 
 // BotClient is the client API for Bot service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BotClient interface {
+	StreamEvents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Event], error)
 	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PingResponse, error)
 }
 
@@ -139,6 +141,25 @@ type botClient struct {
 func NewBotClient(cc grpc.ClientConnInterface) BotClient {
 	return &botClient{cc}
 }
+
+func (c *botClient) StreamEvents(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Event], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &Bot_ServiceDesc.Streams[0], Bot_StreamEvents_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[emptypb.Empty, Event]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Bot_StreamEventsClient = grpc.ServerStreamingClient[Event]
 
 func (c *botClient) Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PingResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -154,6 +175,7 @@ func (c *botClient) Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.Ca
 // All implementations must embed UnimplementedBotServer
 // for forward compatibility.
 type BotServer interface {
+	StreamEvents(*emptypb.Empty, grpc.ServerStreamingServer[Event]) error
 	Ping(context.Context, *emptypb.Empty) (*PingResponse, error)
 	mustEmbedUnimplementedBotServer()
 }
@@ -165,6 +187,9 @@ type BotServer interface {
 // pointer dereference when methods are called.
 type UnimplementedBotServer struct{}
 
+func (UnimplementedBotServer) StreamEvents(*emptypb.Empty, grpc.ServerStreamingServer[Event]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamEvents not implemented")
+}
 func (UnimplementedBotServer) Ping(context.Context, *emptypb.Empty) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
@@ -188,6 +213,17 @@ func RegisterBotServer(s grpc.ServiceRegistrar, srv BotServer) {
 	}
 	s.RegisterService(&Bot_ServiceDesc, srv)
 }
+
+func _Bot_StreamEvents_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(emptypb.Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BotServer).StreamEvents(m, &grpc.GenericServerStream[emptypb.Empty, Event]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type Bot_StreamEventsServer = grpc.ServerStreamingServer[Event]
 
 func _Bot_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
@@ -219,6 +255,12 @@ var Bot_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Bot_Ping_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamEvents",
+			Handler:       _Bot_StreamEvents_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "bot.proto",
 }

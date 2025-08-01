@@ -9,6 +9,7 @@ service Acceptor {
 }
 
 service Bot {
+  rpc StreamEvents(google.protobuf.Empty) returns (stream Event);
   rpc Ping(google.protobuf.Empty) returns (PingResponse);
 }
 
@@ -20,3 +21,56 @@ message ReadyRequest {
 message PingResponse {
   string payload = 1;
 }
+
+message ChatMessage {
+  string json = 1;
+  repeated ChatMessage extra = 2;
+  optional string translate = 3;
+}
+
+message Error {
+  string name = 1;
+  string message = 2;
+  optional Error cause = 3;
+}
+
+message Event {
+  oneof event {
+    ChatEvent chat_event = 1;
+    WhisperEvent whisper_event = 2;
+    ActionBarEvent action_bar_event = 3;
+    ErrorEvent error_event = 4;
+    MessageEvent message_event = 5;
+  }
+}
+
+message ChatEvent {
+  string username = 1;
+  string message = 2;
+  optional string translate = 3;
+  ChatMessage jsonMsg = 4;
+  repeated string matches = 5;
+}
+
+message WhisperEvent {
+  string username = 1;
+  string message = 2;
+  optional string translate = 3;
+  ChatMessage jsonMsg = 4;
+  repeated string matches = 5;
+}
+
+message ActionBarEvent {
+  ChatMessage jsonMsg = 1;
+}
+
+message ErrorEvent {
+  Error err = 1;
+}
+
+message MessageEvent {
+  ChatMessage message = 1;
+  string position = 2;
+}
+
+// TODO finish event types
