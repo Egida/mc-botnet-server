@@ -2,6 +2,7 @@ package bot
 
 import (
 	"context"
+	"errors"
 	"github.com/charmbracelet/log"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"sync"
@@ -30,6 +31,10 @@ type Bot struct {
 	handle RunnerHandle
 }
 
+func (b *Bot) Stop(ctx context.Context) error {
+	return errors.Join(b.client.Close(), b.handle.Stop(ctx))
+}
+
 type Manager struct {
 	runner   Runner
 	acceptor *rpc.Acceptor
@@ -54,14 +59,9 @@ func (m *Manager) Stop(ctx context.Context) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-
-			err := bot.client.Close()
+			err := bot.Stop(ctx)
 			if err != nil {
-				m.l.Error("failed to close client", "error", err, "id", bot.ID)
-			}
-			err = bot.handle.Stop(ctx)
-			if err != nil {
-				m.l.Error("failed to stop runner", "error", err, "id", bot.ID)
+				m.l.Error("failed to stop bot", "err", err)
 			}
 		}()
 	}
