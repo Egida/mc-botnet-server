@@ -16,22 +16,24 @@ import (
 )
 
 type LocalRunner struct {
-	conf *koanf.Koanf
 	l    *log.Logger
+	cmd  string
+	args []string
 }
 
 func NewLocalRunner(conf *koanf.Koanf) *LocalRunner {
-	return &LocalRunner{conf, logger.New("runner", log.InfoLevel)}
+	return &LocalRunner{
+		l:    logger.NewLogger("runner", log.InfoLevel),
+		cmd:  conf.MustString("runner.local.cmd"),
+		args: conf.MustStrings("runner.local.args"),
+	}
 }
 
 func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle, error) {
 	r.l.Info("runner: starting")
 
-	cmd := exec.Command(r.conf.MustString("runner.local.exec"), r.conf.MustStrings("runner.local.args")...)
+	cmd := exec.Command(r.cmd, r.args...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-
-	opts.GRPCHost = "localhost"
-	opts.GRPCPort = r.conf.MustInt("grpc.port")
 	cmd.Env = toEnv(opts)
 
 	stdout, err := cmd.StdoutPipe()
@@ -65,7 +67,7 @@ func pipeOutput(r io.ReadCloser, opts *StartOptions) {
 	scanner := bufio.NewScanner(r)
 	id := opts.BotID.String()
 	id = id[len(id)-6:]
-	l := logger.New(fmt.Sprintf("bot %s", id), log.DebugLevel)
+	l := logger.NewLogger(fmt.Sprintf("bot %s", id), log.DebugLevel)
 	for scanner.Scan() {
 		l.Debug(scanner.Text())
 	}

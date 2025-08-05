@@ -118,6 +118,548 @@ func (x *PingResponse) GetPayload() string {
 	return ""
 }
 
+type ChatMessage struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Json          string                 `protobuf:"bytes,1,opt,name=json,proto3" json:"json,omitempty"`
+	Extra         []*ChatMessage         `protobuf:"bytes,2,rep,name=extra,proto3" json:"extra,omitempty"`
+	Translate     *string                `protobuf:"bytes,3,opt,name=translate,proto3,oneof" json:"translate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChatMessage) Reset() {
+	*x = ChatMessage{}
+	mi := &file_bot_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChatMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatMessage) ProtoMessage() {}
+
+func (x *ChatMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
+func (*ChatMessage) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ChatMessage) GetJson() string {
+	if x != nil {
+		return x.Json
+	}
+	return ""
+}
+
+func (x *ChatMessage) GetExtra() []*ChatMessage {
+	if x != nil {
+		return x.Extra
+	}
+	return nil
+}
+
+func (x *ChatMessage) GetTranslate() string {
+	if x != nil && x.Translate != nil {
+		return *x.Translate
+	}
+	return ""
+}
+
+type Error struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Cause         *Error                 `protobuf:"bytes,3,opt,name=cause,proto3,oneof" json:"cause,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Error) Reset() {
+	*x = Error{}
+	mi := &file_bot_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Error) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Error) ProtoMessage() {}
+
+func (x *Error) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Error.ProtoReflect.Descriptor instead.
+func (*Error) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *Error) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Error) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *Error) GetCause() *Error {
+	if x != nil {
+		return x.Cause
+	}
+	return nil
+}
+
+type Event struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Event:
+	//
+	//	*Event_ChatEvent
+	//	*Event_WhisperEvent
+	//	*Event_ActionBarEvent
+	//	*Event_ErrorEvent
+	//	*Event_MessageEvent
+	Event         isEvent_Event `protobuf_oneof:"event"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Event) Reset() {
+	*x = Event{}
+	mi := &file_bot_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Event) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Event) ProtoMessage() {}
+
+func (x *Event) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Event.ProtoReflect.Descriptor instead.
+func (*Event) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *Event) GetEvent() isEvent_Event {
+	if x != nil {
+		return x.Event
+	}
+	return nil
+}
+
+func (x *Event) GetChatEvent() *ChatEvent {
+	if x != nil {
+		if x, ok := x.Event.(*Event_ChatEvent); ok {
+			return x.ChatEvent
+		}
+	}
+	return nil
+}
+
+func (x *Event) GetWhisperEvent() *WhisperEvent {
+	if x != nil {
+		if x, ok := x.Event.(*Event_WhisperEvent); ok {
+			return x.WhisperEvent
+		}
+	}
+	return nil
+}
+
+func (x *Event) GetActionBarEvent() *ActionBarEvent {
+	if x != nil {
+		if x, ok := x.Event.(*Event_ActionBarEvent); ok {
+			return x.ActionBarEvent
+		}
+	}
+	return nil
+}
+
+func (x *Event) GetErrorEvent() *ErrorEvent {
+	if x != nil {
+		if x, ok := x.Event.(*Event_ErrorEvent); ok {
+			return x.ErrorEvent
+		}
+	}
+	return nil
+}
+
+func (x *Event) GetMessageEvent() *MessageEvent {
+	if x != nil {
+		if x, ok := x.Event.(*Event_MessageEvent); ok {
+			return x.MessageEvent
+		}
+	}
+	return nil
+}
+
+type isEvent_Event interface {
+	isEvent_Event()
+}
+
+type Event_ChatEvent struct {
+	ChatEvent *ChatEvent `protobuf:"bytes,1,opt,name=chat_event,json=chatEvent,proto3,oneof"`
+}
+
+type Event_WhisperEvent struct {
+	WhisperEvent *WhisperEvent `protobuf:"bytes,2,opt,name=whisper_event,json=whisperEvent,proto3,oneof"`
+}
+
+type Event_ActionBarEvent struct {
+	ActionBarEvent *ActionBarEvent `protobuf:"bytes,3,opt,name=action_bar_event,json=actionBarEvent,proto3,oneof"`
+}
+
+type Event_ErrorEvent struct {
+	ErrorEvent *ErrorEvent `protobuf:"bytes,4,opt,name=error_event,json=errorEvent,proto3,oneof"`
+}
+
+type Event_MessageEvent struct {
+	MessageEvent *MessageEvent `protobuf:"bytes,5,opt,name=message_event,json=messageEvent,proto3,oneof"`
+}
+
+func (*Event_ChatEvent) isEvent_Event() {}
+
+func (*Event_WhisperEvent) isEvent_Event() {}
+
+func (*Event_ActionBarEvent) isEvent_Event() {}
+
+func (*Event_ErrorEvent) isEvent_Event() {}
+
+func (*Event_MessageEvent) isEvent_Event() {}
+
+type ChatEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Translate     *string                `protobuf:"bytes,3,opt,name=translate,proto3,oneof" json:"translate,omitempty"`
+	JsonMsg       *ChatMessage           `protobuf:"bytes,4,opt,name=jsonMsg,proto3" json:"jsonMsg,omitempty"`
+	Matches       []string               `protobuf:"bytes,5,rep,name=matches,proto3" json:"matches,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChatEvent) Reset() {
+	*x = ChatEvent{}
+	mi := &file_bot_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChatEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChatEvent) ProtoMessage() {}
+
+func (x *ChatEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChatEvent.ProtoReflect.Descriptor instead.
+func (*ChatEvent) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ChatEvent) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *ChatEvent) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *ChatEvent) GetTranslate() string {
+	if x != nil && x.Translate != nil {
+		return *x.Translate
+	}
+	return ""
+}
+
+func (x *ChatEvent) GetJsonMsg() *ChatMessage {
+	if x != nil {
+		return x.JsonMsg
+	}
+	return nil
+}
+
+func (x *ChatEvent) GetMatches() []string {
+	if x != nil {
+		return x.Matches
+	}
+	return nil
+}
+
+type WhisperEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Translate     *string                `protobuf:"bytes,3,opt,name=translate,proto3,oneof" json:"translate,omitempty"`
+	JsonMsg       *ChatMessage           `protobuf:"bytes,4,opt,name=jsonMsg,proto3" json:"jsonMsg,omitempty"`
+	Matches       []string               `protobuf:"bytes,5,rep,name=matches,proto3" json:"matches,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WhisperEvent) Reset() {
+	*x = WhisperEvent{}
+	mi := &file_bot_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WhisperEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WhisperEvent) ProtoMessage() {}
+
+func (x *WhisperEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WhisperEvent.ProtoReflect.Descriptor instead.
+func (*WhisperEvent) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *WhisperEvent) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *WhisperEvent) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *WhisperEvent) GetTranslate() string {
+	if x != nil && x.Translate != nil {
+		return *x.Translate
+	}
+	return ""
+}
+
+func (x *WhisperEvent) GetJsonMsg() *ChatMessage {
+	if x != nil {
+		return x.JsonMsg
+	}
+	return nil
+}
+
+func (x *WhisperEvent) GetMatches() []string {
+	if x != nil {
+		return x.Matches
+	}
+	return nil
+}
+
+type ActionBarEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JsonMsg       *ChatMessage           `protobuf:"bytes,1,opt,name=jsonMsg,proto3" json:"jsonMsg,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ActionBarEvent) Reset() {
+	*x = ActionBarEvent{}
+	mi := &file_bot_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ActionBarEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ActionBarEvent) ProtoMessage() {}
+
+func (x *ActionBarEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ActionBarEvent.ProtoReflect.Descriptor instead.
+func (*ActionBarEvent) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ActionBarEvent) GetJsonMsg() *ChatMessage {
+	if x != nil {
+		return x.JsonMsg
+	}
+	return nil
+}
+
+type ErrorEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Err           *Error                 `protobuf:"bytes,1,opt,name=err,proto3" json:"err,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ErrorEvent) Reset() {
+	*x = ErrorEvent{}
+	mi := &file_bot_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ErrorEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ErrorEvent) ProtoMessage() {}
+
+func (x *ErrorEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ErrorEvent.ProtoReflect.Descriptor instead.
+func (*ErrorEvent) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ErrorEvent) GetErr() *Error {
+	if x != nil {
+		return x.Err
+	}
+	return nil
+}
+
+type MessageEvent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       *ChatMessage           `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Position      string                 `protobuf:"bytes,2,opt,name=position,proto3" json:"position,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MessageEvent) Reset() {
+	*x = MessageEvent{}
+	mi := &file_bot_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MessageEvent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MessageEvent) ProtoMessage() {}
+
+func (x *MessageEvent) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MessageEvent.ProtoReflect.Descriptor instead.
+func (*MessageEvent) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *MessageEvent) GetMessage() *ChatMessage {
+	if x != nil {
+		return x.Message
+	}
+	return nil
+}
+
+func (x *MessageEvent) GetPosition() string {
+	if x != nil {
+		return x.Position
+	}
+	return ""
+}
+
 var File_bot_proto protoreflect.FileDescriptor
 
 const file_bot_proto_rawDesc = "" +
@@ -127,10 +669,56 @@ const file_bot_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04port\x18\x02 \x01(\x05R\x04port\"(\n" +
 	"\fPingResponse\x12\x18\n" +
-	"\apayload\x18\x01 \x01(\tR\apayload2:\n" +
+	"\apayload\x18\x01 \x01(\tR\apayload\"v\n" +
+	"\vChatMessage\x12\x12\n" +
+	"\x04json\x18\x01 \x01(\tR\x04json\x12\"\n" +
+	"\x05extra\x18\x02 \x03(\v2\f.ChatMessageR\x05extra\x12!\n" +
+	"\ttranslate\x18\x03 \x01(\tH\x00R\ttranslate\x88\x01\x01B\f\n" +
+	"\n" +
+	"_translate\"b\n" +
+	"\x05Error\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12!\n" +
+	"\x05cause\x18\x03 \x01(\v2\x06.ErrorH\x00R\x05cause\x88\x01\x01B\b\n" +
+	"\x06_cause\"\x96\x02\n" +
+	"\x05Event\x12+\n" +
+	"\n" +
+	"chat_event\x18\x01 \x01(\v2\n" +
+	".ChatEventH\x00R\tchatEvent\x124\n" +
+	"\rwhisper_event\x18\x02 \x01(\v2\r.WhisperEventH\x00R\fwhisperEvent\x12;\n" +
+	"\x10action_bar_event\x18\x03 \x01(\v2\x0f.ActionBarEventH\x00R\x0eactionBarEvent\x12.\n" +
+	"\verror_event\x18\x04 \x01(\v2\v.ErrorEventH\x00R\n" +
+	"errorEvent\x124\n" +
+	"\rmessage_event\x18\x05 \x01(\v2\r.MessageEventH\x00R\fmessageEventB\a\n" +
+	"\x05event\"\xb4\x01\n" +
+	"\tChatEvent\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12!\n" +
+	"\ttranslate\x18\x03 \x01(\tH\x00R\ttranslate\x88\x01\x01\x12&\n" +
+	"\ajsonMsg\x18\x04 \x01(\v2\f.ChatMessageR\ajsonMsg\x12\x18\n" +
+	"\amatches\x18\x05 \x03(\tR\amatchesB\f\n" +
+	"\n" +
+	"_translate\"\xb7\x01\n" +
+	"\fWhisperEvent\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12!\n" +
+	"\ttranslate\x18\x03 \x01(\tH\x00R\ttranslate\x88\x01\x01\x12&\n" +
+	"\ajsonMsg\x18\x04 \x01(\v2\f.ChatMessageR\ajsonMsg\x12\x18\n" +
+	"\amatches\x18\x05 \x03(\tR\amatchesB\f\n" +
+	"\n" +
+	"_translate\"8\n" +
+	"\x0eActionBarEvent\x12&\n" +
+	"\ajsonMsg\x18\x01 \x01(\v2\f.ChatMessageR\ajsonMsg\"&\n" +
+	"\n" +
+	"ErrorEvent\x12\x18\n" +
+	"\x03err\x18\x01 \x01(\v2\x06.ErrorR\x03err\"R\n" +
+	"\fMessageEvent\x12&\n" +
+	"\amessage\x18\x01 \x01(\v2\f.ChatMessageR\amessage\x12\x1a\n" +
+	"\bposition\x18\x02 \x01(\tR\bposition2:\n" +
 	"\bAcceptor\x12.\n" +
-	"\x05Ready\x12\r.ReadyRequest\x1a\x16.google.protobuf.Empty24\n" +
-	"\x03Bot\x12-\n" +
+	"\x05Ready\x12\r.ReadyRequest\x1a\x16.google.protobuf.Empty2f\n" +
+	"\x03Bot\x120\n" +
+	"\fStreamEvents\x12\x16.google.protobuf.Empty\x1a\x06.Event0\x01\x12-\n" +
 	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PingResponseB7Z5github.com/mc-botnet/mc-botnet-server/internal/rpc/pbb\x06proto3"
 
 var (
@@ -145,22 +733,44 @@ func file_bot_proto_rawDescGZIP() []byte {
 	return file_bot_proto_rawDescData
 }
 
-var file_bot_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_bot_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_bot_proto_goTypes = []any{
-	(*ReadyRequest)(nil),  // 0: ReadyRequest
-	(*PingResponse)(nil),  // 1: PingResponse
-	(*emptypb.Empty)(nil), // 2: google.protobuf.Empty
+	(*ReadyRequest)(nil),   // 0: ReadyRequest
+	(*PingResponse)(nil),   // 1: PingResponse
+	(*ChatMessage)(nil),    // 2: ChatMessage
+	(*Error)(nil),          // 3: Error
+	(*Event)(nil),          // 4: Event
+	(*ChatEvent)(nil),      // 5: ChatEvent
+	(*WhisperEvent)(nil),   // 6: WhisperEvent
+	(*ActionBarEvent)(nil), // 7: ActionBarEvent
+	(*ErrorEvent)(nil),     // 8: ErrorEvent
+	(*MessageEvent)(nil),   // 9: MessageEvent
+	(*emptypb.Empty)(nil),  // 10: google.protobuf.Empty
 }
 var file_bot_proto_depIdxs = []int32{
-	0, // 0: Acceptor.Ready:input_type -> ReadyRequest
-	2, // 1: Bot.Ping:input_type -> google.protobuf.Empty
-	2, // 2: Acceptor.Ready:output_type -> google.protobuf.Empty
-	1, // 3: Bot.Ping:output_type -> PingResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2,  // 0: ChatMessage.extra:type_name -> ChatMessage
+	3,  // 1: Error.cause:type_name -> Error
+	5,  // 2: Event.chat_event:type_name -> ChatEvent
+	6,  // 3: Event.whisper_event:type_name -> WhisperEvent
+	7,  // 4: Event.action_bar_event:type_name -> ActionBarEvent
+	8,  // 5: Event.error_event:type_name -> ErrorEvent
+	9,  // 6: Event.message_event:type_name -> MessageEvent
+	2,  // 7: ChatEvent.jsonMsg:type_name -> ChatMessage
+	2,  // 8: WhisperEvent.jsonMsg:type_name -> ChatMessage
+	2,  // 9: ActionBarEvent.jsonMsg:type_name -> ChatMessage
+	3,  // 10: ErrorEvent.err:type_name -> Error
+	2,  // 11: MessageEvent.message:type_name -> ChatMessage
+	0,  // 12: Acceptor.Ready:input_type -> ReadyRequest
+	10, // 13: Bot.StreamEvents:input_type -> google.protobuf.Empty
+	10, // 14: Bot.Ping:input_type -> google.protobuf.Empty
+	10, // 15: Acceptor.Ready:output_type -> google.protobuf.Empty
+	4,  // 16: Bot.StreamEvents:output_type -> Event
+	1,  // 17: Bot.Ping:output_type -> PingResponse
+	15, // [15:18] is the sub-list for method output_type
+	12, // [12:15] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_bot_proto_init() }
@@ -168,13 +778,24 @@ func file_bot_proto_init() {
 	if File_bot_proto != nil {
 		return
 	}
+	file_bot_proto_msgTypes[2].OneofWrappers = []any{}
+	file_bot_proto_msgTypes[3].OneofWrappers = []any{}
+	file_bot_proto_msgTypes[4].OneofWrappers = []any{
+		(*Event_ChatEvent)(nil),
+		(*Event_WhisperEvent)(nil),
+		(*Event_ActionBarEvent)(nil),
+		(*Event_ErrorEvent)(nil),
+		(*Event_MessageEvent)(nil),
+	}
+	file_bot_proto_msgTypes[5].OneofWrappers = []any{}
+	file_bot_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bot_proto_rawDesc), len(file_bot_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

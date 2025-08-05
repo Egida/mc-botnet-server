@@ -48,7 +48,7 @@ func NewManager(runner Runner, acceptor *rpc.Acceptor) *Manager {
 	return &Manager{
 		runner:   runner,
 		acceptor: acceptor,
-		l:        logger.New("manager", log.InfoLevel),
+		l:        logger.NewLogger("manager", log.InfoLevel),
 		bots:     make(map[uuid.UUID]*Bot),
 	}
 }
@@ -70,6 +70,7 @@ func (m *Manager) Stop(ctx context.Context) error {
 }
 
 func (m *Manager) StartBot(ctx context.Context) error {
+	// TODO replace this dummy method with an actual implementation
 	id := uuid.New()
 
 	handle, err := m.runner.Start(ctx, &StartOptions{

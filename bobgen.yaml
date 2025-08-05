@@ -1,0 +1,7 @@
+sqlite:
+  dsn: "db.sqlite"
+  driver: "github.com/mattn/go-sqlite3"
+  output: "./internal/database/models"
+no_factory: true
+no_tests: true
+type_system: "database/sql"

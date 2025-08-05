@@ -1,3 +1,6 @@
+jwt.base64 = false
+jwt.secret = "sigma"
+
 [server]
 port = 8080
 
@@ -5,7 +8,7 @@ port = 8080
 type = "local"
 
 [runner.local]
-exec = "bun"
+cmd = "bun"
 args = ["/home/bakane/Projects/mc-botnet-bot/dist/index.js"]
 
 [runner.kubernetes]
@@ -13,3 +16,7 @@ image = { name = "mc-botnet-bot", restart = "Never", pull_policy = "Never" }
 
 [grpc]
 port = 8081
+
+[database]
+driver = "sqlite3"
+url = "db.sqlite"
