@@ -33,7 +33,7 @@ func NewKubernetesRunner(conf *koanf.Koanf) (*KubernetesRunner, error) {
 	return &KubernetesRunner{conf.Cut("runner.kubernetes"), client}, nil
 }
 
-func (r *KubernetesRunner) Start(ctx context.Context, opts *StartOptions) (RunnerHandle, error) {
+func (r *KubernetesRunner) Start(ctx context.Context, opts *RunnerOptions) (RunnerHandle, error) {
 	pods := r.pods()
 	pod := toPod(opts, r.conf)
 
@@ -62,10 +62,10 @@ func (r *KubernetesRunner) pods() typedv1.PodInterface {
 	return r.client.CoreV1().Pods("bot")
 }
 
-func toPod(opts *StartOptions, conf *koanf.Koanf) *corev1.Pod {
+func toPod(opts *RunnerOptions, conf *koanf.Koanf) *corev1.Pod {
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "bot-" + opts.BotID.String(),
+			Name: "bot-" + opts.ID.String(),
 		},
 		Spec: corev1.PodSpec{
 			RestartPolicy: corev1.RestartPolicy(conf.MustString("image.restart")),
@@ -76,23 +76,7 @@ func toPod(opts *StartOptions, conf *koanf.Koanf) *corev1.Pod {
 				Env: []corev1.EnvVar{
 					{
 						Name:  "BOT_ID",
-						Value: opts.BotID.String(),
-					},
-					{
-						Name:  "BOT_HOST",
-						Value: opts.McHost,
-					},
-					{
-						Name:  "BOT_PORT",
-						Value: strconv.Itoa(opts.McPort),
-					},
-					{
-						Name:  "BOT_USERNAME",
-						Value: opts.McUsername,
-					},
-					{
-						Name:  "BOT_AUTH",
-						Value: opts.McAuth,
+						Value: opts.ID.String(),
 					},
 					{
 						Name:  "GRPC_HOST",
@@ -105,13 +89,6 @@ func toPod(opts *StartOptions, conf *koanf.Koanf) *corev1.Pod {
 				},
 			}},
 		},
-	}
-
-	if opts.McToken != "" {
-		pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
-			Name:  "BOT_TOKEN",
-			Value: opts.McToken,
-		})
 	}
 
 	return pod

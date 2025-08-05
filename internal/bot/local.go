@@ -29,7 +29,7 @@ func NewLocalRunner(conf *koanf.Koanf) *LocalRunner {
 	}
 }
 
-func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle, error) {
+func (r *LocalRunner) Start(_ context.Context, opts *RunnerOptions) (RunnerHandle, error) {
 	r.l.Info("runner: starting")
 
 	cmd := exec.Command(r.cmd, r.args...)
@@ -63,9 +63,9 @@ func (r *LocalRunner) Start(_ context.Context, opts *StartOptions) (RunnerHandle
 	return &localRunnerHandle{cmd, done}, nil
 }
 
-func pipeOutput(r io.ReadCloser, opts *StartOptions) {
+func pipeOutput(r io.ReadCloser, opts *RunnerOptions) {
 	scanner := bufio.NewScanner(r)
-	id := opts.BotID.String()
+	id := opts.ID.String()
 	id = id[len(id)-6:]
 	l := logger.NewLogger(fmt.Sprintf("bot %s", id), log.DebugLevel)
 	for scanner.Scan() {
@@ -97,23 +97,15 @@ func (l *localRunnerHandle) Stop(ctx context.Context) error {
 	}
 }
 
-func toEnv(opts *StartOptions) []string {
+func toEnv(opts *RunnerOptions) []string {
 	pair := func(key, value string) string {
 		return fmt.Sprintf("%s=%s", key, value)
 	}
 
 	env := []string{
-		pair("BOT_ID", opts.BotID.String()),
-		pair("BOT_HOST", opts.McHost),
-		pair("BOT_PORT", strconv.Itoa(opts.McPort)),
-		pair("BOT_USERNAME", opts.McUsername),
-		pair("BOT_AUTH", opts.McAuth),
+		pair("BOT_ID", opts.ID.String()),
 		pair("GRPC_HOST", opts.GRPCHost),
 		pair("GRPC_PORT", strconv.Itoa(opts.GRPCPort)),
-	}
-
-	if opts.McToken != "" {
-		env = append(env, pair("BOT_TOKEN", opts.McToken))
 	}
 
 	return env

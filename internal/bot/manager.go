@@ -73,8 +73,8 @@ func (m *Manager) StartBot(ctx context.Context) error {
 	// TODO replace this dummy method with an actual implementation
 	id := uuid.New()
 
-	handle, err := m.runner.Start(ctx, &StartOptions{
-		BotID:    id,
+	handle, err := m.runner.Start(ctx, &RunnerOptions{
+		ID:       id,
 		GRPCHost: "localhost",
 		GRPCPort: 8081,
 	})
