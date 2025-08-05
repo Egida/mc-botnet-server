@@ -53,6 +53,14 @@ func NewAcceptor(conf *koanf.Koanf) *Acceptor {
 	}
 }
 
+func (a *Acceptor) Host() string {
+	return "127.0.0.1"
+}
+
+func (a *Acceptor) Port() int {
+	return a.grpcPort
+}
+
 func (a *Acceptor) Run() error {
 	addr := fmt.Sprintf(":%d", a.grpcPort)
 

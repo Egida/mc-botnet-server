@@ -9,7 +9,7 @@ type = "local"
 
 [runner.local]
 cmd = "bun"
-args = ["/home/bakane/Projects/mc-botnet-bot/dist/index.js"]
+args = ["/home/bakane/Projects/mc-botnet/bot/dist/index.js"]
 
 [runner.kubernetes]
 image = { name = "mc-botnet-bot", restart = "Never", pull_policy = "Never" }

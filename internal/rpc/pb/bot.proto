@@ -9,8 +9,9 @@ service Acceptor {
 }
 
 service Bot {
-  rpc StreamEvents(google.protobuf.Empty) returns (stream Event);
   rpc Ping(google.protobuf.Empty) returns (PingResponse);
+  rpc StreamEvents(google.protobuf.Empty) returns (stream Event);
+  rpc Connect(ConnectRequest) returns (google.protobuf.Empty);
 }
 
 message ReadyRequest {
@@ -20,6 +21,21 @@ message ReadyRequest {
 
 message PingResponse {
   string payload = 1;
+}
+
+message ConnectRequest {
+  string host = 1;
+  int32 port = 2;
+  oneof auth {
+    string offline_username = 4;
+    OnlineAccount online_account = 5;
+  }
+}
+
+message OnlineAccount {
+  string id = 1;
+  string username = 2;
+  string access_token = 3;
 }
 
 message ChatMessage {

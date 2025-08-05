@@ -53,7 +53,7 @@ func router(s *Server) http.Handler {
 
 	mux.HandleFunc("GET /ping", ping)
 
-	mux.HandleFunc("POST /bot", s.createBot)
+	mux.HandleFunc("POST /bot/start", s.startBot)
 
 	mux.HandleFunc("POST /auth/signup", s.signUp)
 	mux.HandleFunc("POST /auth/signin", s.signIn)

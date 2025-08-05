@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"github.com/charmbracelet/log"
-	"github.com/mc-botnet/mc-botnet-server/internal/logger"
-	"sync"
-	"time"
-
 	"github.com/google/uuid"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
+	"github.com/mc-botnet/mc-botnet-server/internal/model"
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
+	"github.com/mc-botnet/mc-botnet-server/internal/rpc/pb"
+	"sync"
 )
 
 type StartOptions struct {
@@ -27,7 +27,7 @@ type StartOptions struct {
 
 type Bot struct {
 	ID     uuid.UUID
-	client rpc.BotClient
+	client *rpc.BotClient
 	handle RunnerHandle
 }
 
@@ -54,6 +54,9 @@ func NewManager(runner Runner, acceptor *rpc.Acceptor) *Manager {
 }
 
 func (m *Manager) Stop(ctx context.Context) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	var wg sync.WaitGroup
 	for _, bot := range m.bots {
 		wg.Add(1)
@@ -66,31 +69,56 @@ func (m *Manager) Stop(ctx context.Context) error {
 		}()
 	}
 	wg.Wait()
+
+	m.bots = make(map[uuid.UUID]*Bot)
+
 	return nil
 }
 
-func (m *Manager) StartBot(ctx context.Context) error {
-	// TODO replace this dummy method with an actual implementation
+func (m *Manager) StartBot(ctx context.Context, req *model.StartBotRequest) error {
 	id := uuid.New()
 
 	handle, err := m.runner.Start(ctx, &RunnerOptions{
 		ID:       id,
-		GRPCHost: "localhost",
-		GRPCPort: 8081,
+		GRPCHost: m.acceptor.Host(),
+		GRPCPort: m.acceptor.Port(),
 	})
 	if err != nil {
 		return err
 	}
-	defer handle.Stop(ctx)
 	m.l.Info("started bot", "id", id)
 
-	botClient, err := m.acceptor.WaitForBot(ctx, id)
+	client, err := m.acceptor.WaitForBot(ctx, id)
 	if err != nil {
+		_ = handle.Stop(ctx)
 		return err
 	}
 	m.l.Info("connected to bot", "id", id)
 
-	time.Sleep(10 * time.Second)
+	err = m.connectBot(ctx, client, req)
+	if err != nil {
+		_ = handle.Stop(ctx)
+		_ = client.Close()
+		return err
+	}
 
-	return botClient.Close()
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.bots[id] = &Bot{
+		ID:     id,
+		client: client,
+		handle: handle,
+	}
+
+	return nil
+}
+
+func (m *Manager) connectBot(ctx context.Context, client *rpc.BotClient, req *model.StartBotRequest) error {
+	// TODO implement online auth with credential storage
+	_, err := client.Connect(ctx, &pb.ConnectRequest{
+		Host: req.Host,
+		Port: int32(req.Port),
+		Auth: &pb.ConnectRequest_OfflineUsername{OfflineUsername: req.OfflineUsername},
+	})
+	return err
 }

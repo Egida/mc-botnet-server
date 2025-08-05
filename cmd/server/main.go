@@ -95,7 +95,7 @@ func run() error {
 	case <-done:
 		log.Info("termination signal received")
 	case <-ctx.Done():
-		log.Error(ctx.Err())
+		log.Error(context.Cause(ctx))
 	}
 
 	// Shutdown

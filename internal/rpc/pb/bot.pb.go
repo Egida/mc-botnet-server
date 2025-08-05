@@ -118,6 +118,164 @@ func (x *PingResponse) GetPayload() string {
 	return ""
 }
 
+type ConnectRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Host  string                 `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
+	Port  int32                  `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
+	// Types that are valid to be assigned to Auth:
+	//
+	//	*ConnectRequest_OfflineUsername
+	//	*ConnectRequest_OnlineAccount
+	Auth          isConnectRequest_Auth `protobuf_oneof:"auth"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectRequest) Reset() {
+	*x = ConnectRequest{}
+	mi := &file_bot_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectRequest) ProtoMessage() {}
+
+func (x *ConnectRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectRequest.ProtoReflect.Descriptor instead.
+func (*ConnectRequest) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ConnectRequest) GetHost() string {
+	if x != nil {
+		return x.Host
+	}
+	return ""
+}
+
+func (x *ConnectRequest) GetPort() int32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
+}
+
+func (x *ConnectRequest) GetAuth() isConnectRequest_Auth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *ConnectRequest) GetOfflineUsername() string {
+	if x != nil {
+		if x, ok := x.Auth.(*ConnectRequest_OfflineUsername); ok {
+			return x.OfflineUsername
+		}
+	}
+	return ""
+}
+
+func (x *ConnectRequest) GetOnlineAccount() *OnlineAccount {
+	if x != nil {
+		if x, ok := x.Auth.(*ConnectRequest_OnlineAccount); ok {
+			return x.OnlineAccount
+		}
+	}
+	return nil
+}
+
+type isConnectRequest_Auth interface {
+	isConnectRequest_Auth()
+}
+
+type ConnectRequest_OfflineUsername struct {
+	OfflineUsername string `protobuf:"bytes,4,opt,name=offline_username,json=offlineUsername,proto3,oneof"`
+}
+
+type ConnectRequest_OnlineAccount struct {
+	OnlineAccount *OnlineAccount `protobuf:"bytes,5,opt,name=online_account,json=onlineAccount,proto3,oneof"`
+}
+
+func (*ConnectRequest_OfflineUsername) isConnectRequest_Auth() {}
+
+func (*ConnectRequest_OnlineAccount) isConnectRequest_Auth() {}
+
+type OnlineAccount struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	AccessToken   string                 `protobuf:"bytes,3,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OnlineAccount) Reset() {
+	*x = OnlineAccount{}
+	mi := &file_bot_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OnlineAccount) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OnlineAccount) ProtoMessage() {}
+
+func (x *OnlineAccount) ProtoReflect() protoreflect.Message {
+	mi := &file_bot_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OnlineAccount.ProtoReflect.Descriptor instead.
+func (*OnlineAccount) Descriptor() ([]byte, []int) {
+	return file_bot_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *OnlineAccount) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *OnlineAccount) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *OnlineAccount) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
 type ChatMessage struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Json          string                 `protobuf:"bytes,1,opt,name=json,proto3" json:"json,omitempty"`
@@ -129,7 +287,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_bot_proto_msgTypes[2]
+	mi := &file_bot_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -141,7 +299,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[2]
+	mi := &file_bot_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -154,7 +312,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{2}
+	return file_bot_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ChatMessage) GetJson() string {
@@ -189,7 +347,7 @@ type Error struct {
 
 func (x *Error) Reset() {
 	*x = Error{}
-	mi := &file_bot_proto_msgTypes[3]
+	mi := &file_bot_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -201,7 +359,7 @@ func (x *Error) String() string {
 func (*Error) ProtoMessage() {}
 
 func (x *Error) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[3]
+	mi := &file_bot_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -214,7 +372,7 @@ func (x *Error) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Error.ProtoReflect.Descriptor instead.
 func (*Error) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{3}
+	return file_bot_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Error) GetName() string {
@@ -254,7 +412,7 @@ type Event struct {
 
 func (x *Event) Reset() {
 	*x = Event{}
-	mi := &file_bot_proto_msgTypes[4]
+	mi := &file_bot_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -266,7 +424,7 @@ func (x *Event) String() string {
 func (*Event) ProtoMessage() {}
 
 func (x *Event) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[4]
+	mi := &file_bot_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -279,7 +437,7 @@ func (x *Event) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Event.ProtoReflect.Descriptor instead.
 func (*Event) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{4}
+	return file_bot_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Event) GetEvent() isEvent_Event {
@@ -381,7 +539,7 @@ type ChatEvent struct {
 
 func (x *ChatEvent) Reset() {
 	*x = ChatEvent{}
-	mi := &file_bot_proto_msgTypes[5]
+	mi := &file_bot_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -393,7 +551,7 @@ func (x *ChatEvent) String() string {
 func (*ChatEvent) ProtoMessage() {}
 
 func (x *ChatEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[5]
+	mi := &file_bot_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -406,7 +564,7 @@ func (x *ChatEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatEvent.ProtoReflect.Descriptor instead.
 func (*ChatEvent) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{5}
+	return file_bot_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ChatEvent) GetUsername() string {
@@ -457,7 +615,7 @@ type WhisperEvent struct {
 
 func (x *WhisperEvent) Reset() {
 	*x = WhisperEvent{}
-	mi := &file_bot_proto_msgTypes[6]
+	mi := &file_bot_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -469,7 +627,7 @@ func (x *WhisperEvent) String() string {
 func (*WhisperEvent) ProtoMessage() {}
 
 func (x *WhisperEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[6]
+	mi := &file_bot_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -482,7 +640,7 @@ func (x *WhisperEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhisperEvent.ProtoReflect.Descriptor instead.
 func (*WhisperEvent) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{6}
+	return file_bot_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *WhisperEvent) GetUsername() string {
@@ -529,7 +687,7 @@ type ActionBarEvent struct {
 
 func (x *ActionBarEvent) Reset() {
 	*x = ActionBarEvent{}
-	mi := &file_bot_proto_msgTypes[7]
+	mi := &file_bot_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -541,7 +699,7 @@ func (x *ActionBarEvent) String() string {
 func (*ActionBarEvent) ProtoMessage() {}
 
 func (x *ActionBarEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[7]
+	mi := &file_bot_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -554,7 +712,7 @@ func (x *ActionBarEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActionBarEvent.ProtoReflect.Descriptor instead.
 func (*ActionBarEvent) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{7}
+	return file_bot_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ActionBarEvent) GetJsonMsg() *ChatMessage {
@@ -573,7 +731,7 @@ type ErrorEvent struct {
 
 func (x *ErrorEvent) Reset() {
 	*x = ErrorEvent{}
-	mi := &file_bot_proto_msgTypes[8]
+	mi := &file_bot_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -585,7 +743,7 @@ func (x *ErrorEvent) String() string {
 func (*ErrorEvent) ProtoMessage() {}
 
 func (x *ErrorEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[8]
+	mi := &file_bot_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -598,7 +756,7 @@ func (x *ErrorEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ErrorEvent.ProtoReflect.Descriptor instead.
 func (*ErrorEvent) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{8}
+	return file_bot_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ErrorEvent) GetErr() *Error {
@@ -618,7 +776,7 @@ type MessageEvent struct {
 
 func (x *MessageEvent) Reset() {
 	*x = MessageEvent{}
-	mi := &file_bot_proto_msgTypes[9]
+	mi := &file_bot_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -630,7 +788,7 @@ func (x *MessageEvent) String() string {
 func (*MessageEvent) ProtoMessage() {}
 
 func (x *MessageEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_bot_proto_msgTypes[9]
+	mi := &file_bot_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -643,7 +801,7 @@ func (x *MessageEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MessageEvent.ProtoReflect.Descriptor instead.
 func (*MessageEvent) Descriptor() ([]byte, []int) {
-	return file_bot_proto_rawDescGZIP(), []int{9}
+	return file_bot_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *MessageEvent) GetMessage() *ChatMessage {
@@ -669,7 +827,17 @@ const file_bot_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04port\x18\x02 \x01(\x05R\x04port\"(\n" +
 	"\fPingResponse\x12\x18\n" +
-	"\apayload\x18\x01 \x01(\tR\apayload\"v\n" +
+	"\apayload\x18\x01 \x01(\tR\apayload\"\xa6\x01\n" +
+	"\x0eConnectRequest\x12\x12\n" +
+	"\x04host\x18\x01 \x01(\tR\x04host\x12\x12\n" +
+	"\x04port\x18\x02 \x01(\x05R\x04port\x12+\n" +
+	"\x10offline_username\x18\x04 \x01(\tH\x00R\x0fofflineUsername\x127\n" +
+	"\x0eonline_account\x18\x05 \x01(\v2\x0e.OnlineAccountH\x00R\ronlineAccountB\x06\n" +
+	"\x04auth\"^\n" +
+	"\rOnlineAccount\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12!\n" +
+	"\faccess_token\x18\x03 \x01(\tR\vaccessToken\"v\n" +
 	"\vChatMessage\x12\x12\n" +
 	"\x04json\x18\x01 \x01(\tR\x04json\x12\"\n" +
 	"\x05extra\x18\x02 \x03(\v2\f.ChatMessageR\x05extra\x12!\n" +
@@ -716,10 +884,11 @@ const file_bot_proto_rawDesc = "" +
 	"\amessage\x18\x01 \x01(\v2\f.ChatMessageR\amessage\x12\x1a\n" +
 	"\bposition\x18\x02 \x01(\tR\bposition2:\n" +
 	"\bAcceptor\x12.\n" +
-	"\x05Ready\x12\r.ReadyRequest\x1a\x16.google.protobuf.Empty2f\n" +
-	"\x03Bot\x120\n" +
-	"\fStreamEvents\x12\x16.google.protobuf.Empty\x1a\x06.Event0\x01\x12-\n" +
-	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PingResponseB7Z5github.com/mc-botnet/mc-botnet-server/internal/rpc/pbb\x06proto3"
+	"\x05Ready\x12\r.ReadyRequest\x1a\x16.google.protobuf.Empty2\x9a\x01\n" +
+	"\x03Bot\x12-\n" +
+	"\x04Ping\x12\x16.google.protobuf.Empty\x1a\r.PingResponse\x120\n" +
+	"\fStreamEvents\x12\x16.google.protobuf.Empty\x1a\x06.Event0\x01\x122\n" +
+	"\aConnect\x12\x0f.ConnectRequest\x1a\x16.google.protobuf.EmptyB7Z5github.com/mc-botnet/mc-botnet-server/internal/rpc/pbb\x06proto3"
 
 var (
 	file_bot_proto_rawDescOnce sync.Once
@@ -733,44 +902,49 @@ func file_bot_proto_rawDescGZIP() []byte {
 	return file_bot_proto_rawDescData
 }
 
-var file_bot_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_bot_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_bot_proto_goTypes = []any{
 	(*ReadyRequest)(nil),   // 0: ReadyRequest
 	(*PingResponse)(nil),   // 1: PingResponse
-	(*ChatMessage)(nil),    // 2: ChatMessage
-	(*Error)(nil),          // 3: Error
-	(*Event)(nil),          // 4: Event
-	(*ChatEvent)(nil),      // 5: ChatEvent
-	(*WhisperEvent)(nil),   // 6: WhisperEvent
-	(*ActionBarEvent)(nil), // 7: ActionBarEvent
-	(*ErrorEvent)(nil),     // 8: ErrorEvent
-	(*MessageEvent)(nil),   // 9: MessageEvent
-	(*emptypb.Empty)(nil),  // 10: google.protobuf.Empty
+	(*ConnectRequest)(nil), // 2: ConnectRequest
+	(*OnlineAccount)(nil),  // 3: OnlineAccount
+	(*ChatMessage)(nil),    // 4: ChatMessage
+	(*Error)(nil),          // 5: Error
+	(*Event)(nil),          // 6: Event
+	(*ChatEvent)(nil),      // 7: ChatEvent
+	(*WhisperEvent)(nil),   // 8: WhisperEvent
+	(*ActionBarEvent)(nil), // 9: ActionBarEvent
+	(*ErrorEvent)(nil),     // 10: ErrorEvent
+	(*MessageEvent)(nil),   // 11: MessageEvent
+	(*emptypb.Empty)(nil),  // 12: google.protobuf.Empty
 }
 var file_bot_proto_depIdxs = []int32{
-	2,  // 0: ChatMessage.extra:type_name -> ChatMessage
-	3,  // 1: Error.cause:type_name -> Error
-	5,  // 2: Event.chat_event:type_name -> ChatEvent
-	6,  // 3: Event.whisper_event:type_name -> WhisperEvent
-	7,  // 4: Event.action_bar_event:type_name -> ActionBarEvent
-	8,  // 5: Event.error_event:type_name -> ErrorEvent
-	9,  // 6: Event.message_event:type_name -> MessageEvent
-	2,  // 7: ChatEvent.jsonMsg:type_name -> ChatMessage
-	2,  // 8: WhisperEvent.jsonMsg:type_name -> ChatMessage
-	2,  // 9: ActionBarEvent.jsonMsg:type_name -> ChatMessage
-	3,  // 10: ErrorEvent.err:type_name -> Error
-	2,  // 11: MessageEvent.message:type_name -> ChatMessage
-	0,  // 12: Acceptor.Ready:input_type -> ReadyRequest
-	10, // 13: Bot.StreamEvents:input_type -> google.protobuf.Empty
-	10, // 14: Bot.Ping:input_type -> google.protobuf.Empty
-	10, // 15: Acceptor.Ready:output_type -> google.protobuf.Empty
-	4,  // 16: Bot.StreamEvents:output_type -> Event
-	1,  // 17: Bot.Ping:output_type -> PingResponse
-	15, // [15:18] is the sub-list for method output_type
-	12, // [12:15] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	3,  // 0: ConnectRequest.online_account:type_name -> OnlineAccount
+	4,  // 1: ChatMessage.extra:type_name -> ChatMessage
+	5,  // 2: Error.cause:type_name -> Error
+	7,  // 3: Event.chat_event:type_name -> ChatEvent
+	8,  // 4: Event.whisper_event:type_name -> WhisperEvent
+	9,  // 5: Event.action_bar_event:type_name -> ActionBarEvent
+	10, // 6: Event.error_event:type_name -> ErrorEvent
+	11, // 7: Event.message_event:type_name -> MessageEvent
+	4,  // 8: ChatEvent.jsonMsg:type_name -> ChatMessage
+	4,  // 9: WhisperEvent.jsonMsg:type_name -> ChatMessage
+	4,  // 10: ActionBarEvent.jsonMsg:type_name -> ChatMessage
+	5,  // 11: ErrorEvent.err:type_name -> Error
+	4,  // 12: MessageEvent.message:type_name -> ChatMessage
+	0,  // 13: Acceptor.Ready:input_type -> ReadyRequest
+	12, // 14: Bot.Ping:input_type -> google.protobuf.Empty
+	12, // 15: Bot.StreamEvents:input_type -> google.protobuf.Empty
+	2,  // 16: Bot.Connect:input_type -> ConnectRequest
+	12, // 17: Acceptor.Ready:output_type -> google.protobuf.Empty
+	1,  // 18: Bot.Ping:output_type -> PingResponse
+	6,  // 19: Bot.StreamEvents:output_type -> Event
+	12, // 20: Bot.Connect:output_type -> google.protobuf.Empty
+	17, // [17:21] is the sub-list for method output_type
+	13, // [13:17] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_bot_proto_init() }
@@ -778,24 +952,28 @@ func file_bot_proto_init() {
 	if File_bot_proto != nil {
 		return
 	}
-	file_bot_proto_msgTypes[2].OneofWrappers = []any{}
-	file_bot_proto_msgTypes[3].OneofWrappers = []any{}
-	file_bot_proto_msgTypes[4].OneofWrappers = []any{
+	file_bot_proto_msgTypes[2].OneofWrappers = []any{
+		(*ConnectRequest_OfflineUsername)(nil),
+		(*ConnectRequest_OnlineAccount)(nil),
+	}
+	file_bot_proto_msgTypes[4].OneofWrappers = []any{}
+	file_bot_proto_msgTypes[5].OneofWrappers = []any{}
+	file_bot_proto_msgTypes[6].OneofWrappers = []any{
 		(*Event_ChatEvent)(nil),
 		(*Event_WhisperEvent)(nil),
 		(*Event_ActionBarEvent)(nil),
 		(*Event_ErrorEvent)(nil),
 		(*Event_MessageEvent)(nil),
 	}
-	file_bot_proto_msgTypes[5].OneofWrappers = []any{}
-	file_bot_proto_msgTypes[6].OneofWrappers = []any{}
+	file_bot_proto_msgTypes[7].OneofWrappers = []any{}
+	file_bot_proto_msgTypes[8].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_bot_proto_rawDesc), len(file_bot_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   2,
 		},
