@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+
 	"github.com/mc-botnet/mc-botnet-server/internal/database/models"
 	"github.com/mc-botnet/mc-botnet-server/internal/model"
 	"github.com/stephenafamo/bob"

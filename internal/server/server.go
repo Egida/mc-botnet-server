@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/charmbracelet/log"
 	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/auth"
 	"github.com/mc-botnet/mc-botnet-server/internal/bot"
 	"github.com/mc-botnet/mc-botnet-server/internal/database"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
-	"net/http"
 )
 
 type Server struct {

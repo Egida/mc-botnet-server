@@ -2,10 +2,11 @@ package server
 
 import (
 	"errors"
-	"github.com/mc-botnet/mc-botnet-server/internal/auth"
-	"github.com/mc-botnet/mc-botnet-server/internal/database"
 	"net/http"
 	"strconv"
+
+	"github.com/mc-botnet/mc-botnet-server/internal/auth"
+	"github.com/mc-botnet/mc-botnet-server/internal/database"
 )
 
 func (s *Server) getUser(w http.ResponseWriter, r *http.Request) {

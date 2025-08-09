@@ -2,10 +2,11 @@ package server
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/mc-botnet/mc-botnet-server/internal/auth"
 	"github.com/mc-botnet/mc-botnet-server/internal/database"
 	"github.com/mc-botnet/mc-botnet-server/internal/model"
-	"net/http"
 )
 
 func (s *Server) signUp(w http.ResponseWriter, r *http.Request) {

@@ -5,12 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/charmbracelet/log"
-	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"io"
 	"os/exec"
 	"strconv"
 	"syscall"
+
+	"github.com/charmbracelet/log"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 
 	"github.com/knadh/koanf/v2"
 )

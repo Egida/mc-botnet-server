@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/mc-botnet/mc-botnet-server/internal/model"
 	"net/http"
+
+	"github.com/mc-botnet/mc-botnet-server/internal/model"
 )
 
 func (s *Server) startBot(w http.ResponseWriter, r *http.Request) {

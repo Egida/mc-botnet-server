@@ -1,8 +1,9 @@
 package logger
 
 import (
-	"github.com/charmbracelet/log"
 	"os"
+
+	"github.com/charmbracelet/log"
 )
 
 func NewLogger(prefix string, level log.Level) *log.Logger {

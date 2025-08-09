@@ -3,16 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/charmbracelet/log"
 	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/auth"
 	"github.com/mc-botnet/mc-botnet-server/internal/config"
 	"github.com/mc-botnet/mc-botnet-server/internal/database"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	"github.com/mc-botnet/mc-botnet-server/internal/bot"
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc"

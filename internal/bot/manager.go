@@ -3,13 +3,14 @@ package bot
 import (
 	"context"
 	"errors"
+	"sync"
+
 	"github.com/charmbracelet/log"
 	"github.com/google/uuid"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"github.com/mc-botnet/mc-botnet-server/internal/model"
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc"
 	"github.com/mc-botnet/mc-botnet-server/internal/rpc/pb"
-	"sync"
 )
 
 type StartOptions struct {

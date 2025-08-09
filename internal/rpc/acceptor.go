@@ -3,11 +3,12 @@ package rpc
 import (
 	"context"
 	"fmt"
-	"github.com/charmbracelet/log"
-	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"net"
 	"strconv"
 	"sync"
+
+	"github.com/charmbracelet/log"
+	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 
 	"github.com/google/uuid"
 	"github.com/knadh/koanf/v2"

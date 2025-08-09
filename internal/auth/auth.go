@@ -4,6 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/charmbracelet/log"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/knadh/koanf/v2"
@@ -11,9 +15,6 @@ import (
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 	"github.com/mc-botnet/mc-botnet-server/internal/model"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 var ErrUnauthorized = errors.New("auth: unauthorized")
