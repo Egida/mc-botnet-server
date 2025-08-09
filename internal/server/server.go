@@ -3,10 +3,12 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/charmbracelet/log"
+	"github.com/go-playground/validator/v10"
 	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/auth"
 	"github.com/mc-botnet/mc-botnet-server/internal/bot"
@@ -19,6 +21,7 @@ type Server struct {
 	manager     *bot.Manager
 	authService *auth.Service
 	store       database.Store
+	validate    *validator.Validate
 
 	httpServer *http.Server
 }
@@ -28,12 +31,14 @@ func NewServer(
 	manager *bot.Manager,
 	authService *auth.Service,
 	store database.Store,
+	validate *validator.Validate,
 ) (*Server, error) {
 	s := &Server{
 		l:           logger.NewLogger("server", log.InfoLevel),
 		manager:     manager,
 		authService: authService,
 		store:       store,
+		validate:    validate,
 	}
 
 	mux := router(s)
@@ -74,7 +79,7 @@ func (s *Server) Run() error {
 	return s.httpServer.ListenAndServe()
 }
 
-func parseBody[T any](w http.ResponseWriter, r *http.Request) (*T, bool) {
+func parseBody[T any](s *Server, w http.ResponseWriter, r *http.Request) (*T, bool) {
 	var v T
 
 	err := json.NewDecoder(r.Body).Decode(&v)
@@ -83,18 +88,48 @@ func parseBody[T any](w http.ResponseWriter, r *http.Request) (*T, bool) {
 		return nil, false
 	}
 
+	errs := validate(s, v)
+	if len(errs) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(errs)
+		return nil, false
+	}
+
 	return &v, true
 }
 
-func writeJson(w http.ResponseWriter, v any) {
+func writeJson(s *Server, w http.ResponseWriter, v any) {
 	b, err := json.Marshal(v)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Error("error marshaling response", "err", err)
+		s.l.Error("error marshaling response", "err", err)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	_, _ = w.Write(b)
+}
+
+type Validator interface {
+	Validate() []string
+}
+
+func validate(s *Server, v any) []error {
+	var errs []error
+
+	err := s.validate.Struct(v)
+	if err != nil {
+		for _, e := range err.(validator.ValidationErrors) {
+			errs = append(errs, e)
+		}
+	}
+
+	if v1, ok := v.(Validator); ok {
+		for _, e := range v1.Validate() {
+			errs = append(errs, errors.New(e))
+		}
+	}
+
+	return errs
 }
 
 func ping(w http.ResponseWriter, _ *http.Request) {

@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) signUp(w http.ResponseWriter, r *http.Request) {
-	body, ok := parseBody[model.SignUp](w, r)
+	body, ok := parseBody[model.SignUp](s, w, r)
 	if !ok {
 		return
 	}
@@ -25,11 +25,11 @@ func (s *Server) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, &model.AuthResponse{Token: token})
+	writeJson(s, w, &model.AuthResponse{Token: token})
 }
 
 func (s *Server) signIn(w http.ResponseWriter, r *http.Request) {
-	body, ok := parseBody[model.SignIn](w, r)
+	body, ok := parseBody[model.SignIn](s, w, r)
 	if !ok {
 		return
 	}
@@ -48,5 +48,5 @@ func (s *Server) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, &model.AuthResponse{Token: token})
+	writeJson(s, w, &model.AuthResponse{Token: token})
 }

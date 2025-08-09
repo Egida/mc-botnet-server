@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
+	"github.com/go-playground/validator/v10"
 	"github.com/knadh/koanf/v2"
 	"github.com/mc-botnet/mc-botnet-server/internal/auth"
 	"github.com/mc-botnet/mc-botnet-server/internal/config"
@@ -75,8 +76,10 @@ func run() error {
 	// Manager
 	manager := bot.NewManager(runner, acceptor)
 
+	validate := validator.New()
+
 	// HTTP Server
-	s, err := server.NewServer(conf, manager, authService, store)
+	s, err := server.NewServer(conf, manager, authService, store, validate)
 	if err != nil {
 		return err
 	}

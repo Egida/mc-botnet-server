@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) startBot(w http.ResponseWriter, r *http.Request) {
-	body, ok := parseBody[model.StartBotRequest](w, r)
+	body, ok := parseBody[model.StartBotRequest](s, w, r)
 	if !ok {
 		return
 	}

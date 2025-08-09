@@ -26,7 +26,7 @@ func (s *Server) getUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, u)
+	writeJson(s, w, u)
 }
 
 func (s *Server) me(w http.ResponseWriter, r *http.Request) {
@@ -42,5 +42,5 @@ func (s *Server) me(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, u)
+	writeJson(s, w, u)
 }
