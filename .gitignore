@@ -33,3 +33,6 @@ go.work.sum
 
 # DB for testing
 db.sqlite
+
+# Test MC server
+mc/
