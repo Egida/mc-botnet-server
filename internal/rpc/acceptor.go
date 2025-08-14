@@ -9,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
+	"github.com/pkg/errors"
 
 	"github.com/google/uuid"
 	"github.com/knadh/koanf/v2"
@@ -102,7 +103,7 @@ func (a *Acceptor) Ready(ctx context.Context, request *pb.ReadyRequest) (*emptyp
 	err := a.ready(ctx, request)
 	if err != nil {
 		a.l.Error("error in /Ready", "err", err)
-		return nil, fmt.Errorf("acceptor: %w", err)
+		return nil, errors.Wrap(err, "acceptor")
 	}
 	return new(emptypb.Empty), nil
 }
@@ -164,10 +165,10 @@ func (a *Acceptor) WaitForBot(ctx context.Context, id uuid.UUID) (*BotClient, er
 		// test connection
 		_, err := b.Ping(ctx, new(emptypb.Empty))
 		if err != nil {
-			return nil, fmt.Errorf("acceptor: %w", err)
+			return nil, errors.Wrap(err, "acceptor")
 		}
 		return b, nil
 	case <-ctx.Done():
-		return nil, fmt.Errorf("acceptor: %w", ctx.Err())
+		return nil, errors.Wrap(ctx.Err(), "acceptor")
 	}
 }

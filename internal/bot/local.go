@@ -34,7 +34,6 @@ func (r *LocalRunner) Start(_ context.Context, opts *RunnerOptions) (RunnerHandl
 	r.l.Info("runner: starting")
 
 	cmd := exec.Command(r.cmd, r.args...)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Env = toEnv(opts)
 
 	stdout, err := cmd.StdoutPipe()
@@ -57,9 +56,7 @@ func (r *LocalRunner) Start(_ context.Context, opts *RunnerOptions) (RunnerHandl
 	}
 
 	done := make(chan error, 1)
-	go func() {
-		done <- cmd.Wait()
-	}()
+	go func() { done <- cmd.Wait() }()
 
 	return &localRunnerHandle{cmd, done}, nil
 }
@@ -80,12 +77,7 @@ type localRunnerHandle struct {
 }
 
 func (l *localRunnerHandle) Stop(ctx context.Context) error {
-	pgid, err := syscall.Getpgid(l.cmd.Process.Pid)
-	if err != nil {
-		return err
-	}
-
-	err = syscall.Kill(-pgid, syscall.SIGTERM)
+	err := l.cmd.Process.Signal(syscall.SIGTERM)
 	if err != nil {
 		return err
 	}
@@ -94,7 +86,7 @@ func (l *localRunnerHandle) Stop(ctx context.Context) error {
 	case err = <-l.done:
 		return err
 	case <-ctx.Done():
-		return errors.Join(ctx.Err(), syscall.Kill(-pgid, syscall.SIGKILL))
+		return errors.Join(ctx.Err(), l.cmd.Process.Kill())
 	}
 }
 

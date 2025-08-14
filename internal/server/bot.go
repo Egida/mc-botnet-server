@@ -1,7 +1,9 @@
 package server
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/mc-botnet/mc-botnet-server/internal/model"
 )
@@ -11,6 +13,9 @@ func (s *Server) startBot(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
+
+	_, cancel := context.WithTimeout(r.Context(), time.Second*5)
+	defer cancel()
 
 	err := s.manager.StartBot(r.Context(), body)
 	if err != nil {

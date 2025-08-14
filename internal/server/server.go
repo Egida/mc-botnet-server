@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/charmbracelet/log"
 	"github.com/go-playground/validator/v10"
@@ -15,6 +16,8 @@ import (
 	"github.com/mc-botnet/mc-botnet-server/internal/database"
 	"github.com/mc-botnet/mc-botnet-server/internal/logger"
 )
+
+const RequestTimeout = 10 * time.Second
 
 type Server struct {
 	l           *log.Logger
@@ -56,10 +59,11 @@ func router(s *Server) http.Handler {
 
 	// Middlewares
 	a := s.authService.Middleware
+	t := timeout
 
 	mux.HandleFunc("GET /ping", ping)
 
-	mux.HandleFunc("POST /bot/start", s.startBot)
+	mux.HandleFunc("POST /bot/start", t(s.startBot))
 
 	mux.HandleFunc("POST /auth/signup", s.signUp)
 	mux.HandleFunc("POST /auth/signin", s.signIn)
@@ -130,6 +134,12 @@ func validate(s *Server, v any) []error {
 	}
 
 	return errs
+}
+
+func timeout(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.TimeoutHandler(next, RequestTimeout, "request timed out").ServeHTTP(w, r)
+	}
 }
 
 func ping(w http.ResponseWriter, _ *http.Request) {

@@ -91,16 +91,13 @@ func (m *Manager) StartBot(ctx context.Context, req *model.StartBotRequest) erro
 
 	client, err := m.acceptor.WaitForBot(ctx, id)
 	if err != nil {
-		_ = handle.Stop(ctx)
-		return err
+		return errors.Join(err, handle.Stop(ctx))
 	}
 	m.l.Info("connected to bot", "id", id)
 
 	err = m.connectBot(ctx, client, req)
 	if err != nil {
-		_ = handle.Stop(ctx)
-		_ = client.Close()
-		return err
+		return errors.Join(err, handle.Stop(ctx), client.Close())
 	}
 
 	m.mu.Lock()
